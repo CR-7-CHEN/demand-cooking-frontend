@@ -25,20 +25,20 @@
     </el-card>
 
     <el-card shadow="hover">
-      <el-table v-loading="loading" border :data="rows">
+      <el-table v-loading="loading" border :data="rows" style="width: 100%">
         <el-table-column label="姓名" prop="chefName" min-width="120" />
-        <el-table-column label="手机号" prop="mobile" width="130" />
-        <el-table-column label="区域" prop="areaName" min-width="140" />
+        <el-table-column label="手机号" prop="mobile" min-width="130" />
+        <el-table-column label="服务区域" prop="areaName" min-width="140" show-overflow-tooltip />
         <el-table-column label="擅长" prop="skillTags" min-width="160" show-overflow-tooltip />
-        <el-table-column label="健康证到期" prop="healthCertExpireDate" width="160" />
-        <el-table-column label="评分" prop="rating" width="90" />
-        <el-table-column label="完成单数" prop="completedOrders" width="100" />
-        <el-table-column label="审核" width="100">
+        <el-table-column label="健康证到期" prop="healthCertExpireDate" min-width="160" />
+        <el-table-column label="评分" prop="rating" min-width="90" />
+        <el-table-column label="完成单数" prop="completedOrders" min-width="100" />
+        <el-table-column label="审核" min-width="100">
           <template #default="{ row }">
             <el-tag>{{ auditText(row.auditStatus) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="状态" width="100">
+        <el-table-column label="状态" min-width="100">
           <template #default="{ row }">
             <el-tag :type="row.chefStatus === '0' ? 'success' : 'info'">{{ statusText(row.chefStatus) }}</el-tag>
           </template>

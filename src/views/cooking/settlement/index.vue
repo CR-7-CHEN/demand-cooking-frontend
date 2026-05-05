@@ -11,16 +11,20 @@
       </el-form>
     </el-card>
     <el-card shadow="hover">
-      <el-table v-loading="loading" border :data="rows">
-        <el-table-column label="月份" prop="settlementMonth" width="110" />
-        <el-table-column label="做饭人员" prop="chefId" width="110" />
-        <el-table-column label="完成单数" prop="orderCount" width="100" />
-        <el-table-column label="订单金额" prop="orderAmount" width="120" />
-        <el-table-column label="个人底薪" prop="baseSalary" width="120" />
-        <el-table-column label="违约次数" prop="violationCount" width="100" />
-        <el-table-column label="违约扣款" prop="violationDeduction" width="120" />
-        <el-table-column label="应发金额" prop="payableAmount" width="120" />
-        <el-table-column label="状态" prop="status" width="110" />
+      <el-table v-loading="loading" border :data="rows" style="width: 100%">
+        <el-table-column label="月份" prop="settlementMonth" min-width="110" />
+        <el-table-column label="做饭人员" prop="chefId" min-width="110" />
+        <el-table-column label="完成单数" prop="orderCount" min-width="100" />
+        <el-table-column label="订单金额" prop="orderAmount" min-width="120" />
+        <el-table-column label="个人底薪" prop="baseSalary" min-width="120" />
+        <el-table-column label="违约次数" prop="violationCount" min-width="100" />
+        <el-table-column label="违约扣款" prop="violationDeduction" min-width="120" />
+        <el-table-column label="应发金额" prop="payableAmount" min-width="120" />
+        <el-table-column label="状态" prop="status" min-width="110">
+          <template #default="{ row }">
+            <el-tag :type="statusType[row.status]">{{ statusMap[row.status] || row.status }}</el-tag>
+          </template>
+        </el-table-column>
       </el-table>
       <pagination v-show="total > 0" v-model:page="queryParams.pageNum" v-model:limit="queryParams.pageSize" :total="total" @pagination="getList" />
     </el-card>
@@ -32,6 +36,8 @@ import { generateSettlement, listSettlement } from '@/api/cooking/settlement';
 import type { SettlementVO } from '@/api/cooking/settlement/types';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+const statusMap: Record<string, string> = { GENERATED: '已生成', CONFIRMED: '已确认', PAID: '已发放' };
+const statusType: Record<string, string> = { GENERATED: 'info', CONFIRMED: 'warning', PAID: 'success' };
 const loading = ref(false);
 const rows = ref<SettlementVO[]>([]);
 const total = ref(0);

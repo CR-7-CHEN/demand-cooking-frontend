@@ -12,12 +12,12 @@
       </el-form>
     </el-card>
     <el-card shadow="hover">
-      <el-table v-loading="loading" border :data="rows">
+      <el-table v-loading="loading" border :data="rows" style="width: 100%">
         <el-table-column label="菜品" prop="dishName" min-width="150" />
-        <el-table-column label="分类" prop="category" width="130" />
-        <el-table-column label="菜系" prop="cuisine" width="130" />
-        <el-table-column label="状态" width="100"><template #default="{ row }"><el-tag>{{ row.status === '0' ? '启用' : '停用' }}</el-tag></template></el-table-column>
-        <el-table-column label="排序" prop="sort" width="90" />
+        <el-table-column label="分类" prop="category" min-width="130" />
+        <el-table-column label="菜系" prop="cuisine" min-width="130" />
+        <el-table-column label="状态" min-width="100"><template #default="{ row }"><el-tag>{{ row.status === '0' ? '启用' : '停用' }}</el-tag></template></el-table-column>
+        <el-table-column label="排序" prop="sort" min-width="90" />
         <el-table-column label="说明" prop="description" min-width="220" show-overflow-tooltip />
         <el-table-column label="操作" fixed="right" width="150">
           <template #default="{ row }">
@@ -33,7 +33,7 @@
         <el-form-item label="菜品名"><el-input v-model="form.dishName" /></el-form-item>
         <el-form-item label="分类"><el-input v-model="form.category" /></el-form-item>
         <el-form-item label="菜系"><el-input v-model="form.cuisine" /></el-form-item>
-        <el-form-item label="图片"><el-input v-model="form.imageUrl" /></el-form-item>
+        <el-form-item label="图片"><ImageUpload v-model="form.imageUrl" :limit="1" :file-size="5" /></el-form-item>
         <el-form-item label="状态"><el-radio-group v-model="form.status"><el-radio value="0">启用</el-radio><el-radio value="1">停用</el-radio></el-radio-group></el-form-item>
         <el-form-item label="说明"><el-input v-model="form.description" type="textarea" /></el-form-item>
       </el-form>

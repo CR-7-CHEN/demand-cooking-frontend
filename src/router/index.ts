@@ -88,51 +88,6 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: { title: '个人中心', icon: 'user' }
       }
     ]
-  },
-  {
-    path: '/cooking',
-    component: Layout,
-    redirect: '/cooking/chef',
-    alwaysShow: true,
-    meta: { title: '上门做饭', icon: 'shopping' },
-    children: [
-      {
-        path: 'chef',
-        component: () => import('@/views/cooking/chef/index.vue'),
-        name: 'CookingChef',
-        meta: { title: '服务人员', icon: 'people' }
-      },
-      {
-        path: 'order',
-        component: () => import('@/views/cooking/order/index.vue'),
-        name: 'CookingOrder',
-        meta: { title: '订单管理', icon: 'list' }
-      },
-      {
-        path: 'dish',
-        component: () => import('@/views/cooking/dish/index.vue'),
-        name: 'CookingDish',
-        meta: { title: '菜品库', icon: 'category' }
-      },
-      {
-        path: 'complaint',
-        component: () => import('@/views/cooking/complaint/index.vue'),
-        name: 'CookingComplaint',
-        meta: { title: '投诉记录', icon: 'message' }
-      },
-      {
-        path: 'settlement',
-        component: () => import('@/views/cooking/settlement/index.vue'),
-        name: 'CookingSettlement',
-        meta: { title: '结算管理', icon: 'money' }
-      },
-      {
-        path: 'config',
-        component: () => import('@/views/cooking/config/index.vue'),
-        name: 'CookingConfig',
-        meta: { title: '业务配置', icon: 'system' }
-      }
-    ]
   }
 ];
 

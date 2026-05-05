@@ -1,34 +1,13 @@
 <template>
   <div class="p-2">
     <el-row :gutter="20">
-      <!-- 部门树 -->
-      <el-col :lg="4" :xs="24" style="">
-        <el-card shadow="hover">
-          <el-input v-model="deptName" placeholder="请输入部门名称" prefix-icon="Search" clearable />
-          <el-tree
-            ref="deptTreeRef"
-            class="mt-2"
-            node-key="id"
-            :data="deptOptions"
-            :props="{ label: 'label', children: 'children' } as any"
-            :expand-on-click-node="false"
-            :filter-node-method="filterNode"
-            highlight-current
-            default-expand-all
-            @node-click="handleNodeClick"
-          />
-        </el-card>
-      </el-col>
-      <el-col :lg="20" :xs="24">
+      <el-col :lg="24" :xs="24">
         <transition :enter-active-class="proxy?.animate.searchAnimate.enter" :leave-active-class="proxy?.animate.searchAnimate.leave">
           <div v-show="showSearch" class="mb-[10px]">
             <el-card shadow="hover">
               <el-form ref="queryFormRef" :model="queryParams" :inline="true">
                 <el-form-item label="用户名称" prop="userName">
                   <el-input v-model="queryParams.userName" placeholder="请输入用户名称" clearable @keyup.enter="handleQuery" />
-                </el-form-item>
-                <el-form-item label="用户昵称" prop="nickName">
-                  <el-input v-model="queryParams.nickName" placeholder="请输入用户昵称" clearable @keyup.enter="handleQuery" />
                 </el-form-item>
                 <el-form-item label="手机号码" prop="phonenumber">
                   <el-input v-model="queryParams.phonenumber" placeholder="请输入手机号码" clearable @keyup.enter="handleQuery" />
@@ -99,16 +78,14 @@
             <el-table-column type="selection" width="50" align="center" />
             <el-table-column v-if="columns[0].visible" key="userId" label="用户编号" align="center" prop="userId" />
             <el-table-column v-if="columns[1].visible" key="userName" label="用户名称" align="center" prop="userName" :show-overflow-tooltip="true" />
-            <el-table-column v-if="columns[2].visible" key="nickName" label="用户昵称" align="center" prop="nickName" :show-overflow-tooltip="true" />
-            <el-table-column v-if="columns[3].visible" key="deptName" label="部门" align="center" prop="deptName" :show-overflow-tooltip="true" />
-            <el-table-column v-if="columns[4].visible" key="phonenumber" label="手机号码" align="center" prop="phonenumber" width="120" />
-            <el-table-column v-if="columns[5].visible" key="status" label="状态" align="center">
+            <el-table-column v-if="columns[2].visible" key="phonenumber" label="手机号码" align="center" prop="phonenumber" width="120" />
+            <el-table-column v-if="columns[3].visible" key="status" label="状态" align="center">
               <template #default="scope">
                 <el-switch v-model="scope.row.status" active-value="0" inactive-value="1" @change="handleStatusChange(scope.row)"></el-switch>
               </template>
             </el-table-column>
 
-            <el-table-column v-if="columns[6].visible" label="创建时间" align="center" prop="createTime" width="160">
+            <el-table-column v-if="columns[4].visible" label="创建时间" align="center" prop="createTime" width="160">
               <template #default="scope">
                 <span>{{ scope.row.createTime }}</span>
               </template>
@@ -291,7 +268,7 @@
 <script setup name="User" lang="ts">
 import api from '@/api/system/user';
 import { UserForm, UserQuery, UserVO } from '@/api/system/user/types';
-import { DeptTreeVO, DeptVO } from '@/api/system/dept/types';
+import { DeptTreeVO } from '@/api/system/dept/types';
 import { RoleVO } from '@/api/system/role/types';
 import { PostVO } from '@/api/system/post/types';
 import { globalHeaders } from '@/utils/request';
@@ -311,8 +288,6 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const dateRange = ref<[DateModelType, DateModelType]>(['', '']);
-const deptName = ref('');
-const deptOptions = ref<DeptTreeVO[]>([]);
 const enabledDeptOptions = ref<DeptTreeVO[]>([]);
 const initPassword = ref<string>('');
 const postOptions = ref<PostVO[]>([]);
@@ -336,14 +311,11 @@ const upload = reactive<ImportOption>({
 const columns = ref<FieldOption[]>([
   { key: 0, label: `用户编号`, visible: false, children: [] },
   { key: 1, label: `用户名称`, visible: true, children: [] },
-  { key: 2, label: `用户昵称`, visible: true, children: [] },
-  { key: 3, label: `部门`, visible: true, children: [] },
-  { key: 4, label: `手机号码`, visible: true, children: [] },
-  { key: 5, label: `状态`, visible: true, children: [] },
-  { key: 6, label: `创建时间`, visible: true, children: [] }
+  { key: 2, label: `手机号码`, visible: true, children: [] },
+  { key: 3, label: `状态`, visible: true, children: [] },
+  { key: 4, label: `创建时间`, visible: true, children: [] }
 ]);
 
-const deptTreeRef = ref<ElTreeInstance>();
 const queryFormRef = ref<ElFormInstance>();
 const userFormRef = ref<ElFormInstance>();
 const uploadRef = ref<ElUploadInstance>();
@@ -422,21 +394,6 @@ const data = reactive<PageData<UserForm, UserQuery>>(initData);
 
 const { queryParams, form, rules } = toRefs<PageData<UserForm, UserQuery>>(data);
 
-/** 通过条件过滤节点  */
-const filterNode = (value: string, data: any) => {
-  if (!value) return true;
-  return data.label.indexOf(value) !== -1;
-};
-/** 根据名称筛选部门树 */
-watchEffect(
-  () => {
-    deptTreeRef.value?.filter(deptName.value);
-  },
-  {
-    flush: 'post' // watchEffect会在DOM挂载或者更新之前就会触发，此属性控制在DOM元素更新后运行
-  }
-);
-
 /** 查询用户列表 */
 const getList = async () => {
   loading.value = true;
@@ -449,7 +406,6 @@ const getList = async () => {
 /** 查询部门下拉树结构 */
 const getDeptTree = async () => {
   const res = await api.deptTreeSelect();
-  deptOptions.value = res.data;
   enabledDeptOptions.value = filterDisabledDept(res.data);
 };
 
@@ -466,12 +422,6 @@ const filterDisabledDept = (deptList: DeptTreeVO[]) => {
   });
 };
 
-/** 节点单击事件 */
-const handleNodeClick = (data: DeptVO) => {
-  queryParams.value.deptId = data.id;
-  handleQuery();
-};
-
 /** 搜索按钮操作 */
 const handleQuery = () => {
   queryParams.value.pageNum = 1;
@@ -483,7 +433,6 @@ const resetQuery = () => {
   queryFormRef.value?.resetFields();
   queryParams.value.pageNum = 1;
   queryParams.value.deptId = undefined;
-  deptTreeRef.value?.setCurrentKey(undefined);
   handleQuery();
 };
 

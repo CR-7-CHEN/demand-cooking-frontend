@@ -11,13 +11,19 @@
       </el-form>
     </el-card>
     <el-card shadow="hover">
-      <el-table v-loading="loading" border :data="rows">
+      <el-table v-loading="loading" border :data="rows" style="width: 100%">
         <el-table-column label="配置名" prop="configName" min-width="160" />
         <el-table-column label="配置键" prop="configKey" min-width="210" />
         <el-table-column label="配置值" prop="configValue" min-width="160" show-overflow-tooltip />
-        <el-table-column label="类型" prop="configType" width="110" />
-        <el-table-column label="发布状态" prop="publishStatus" width="110" />
-        <el-table-column label="生效时间" prop="effectiveTime" width="170" />
+        <el-table-column label="类型" prop="configType" min-width="110">
+          <template #default="{ row }">{{ configTypeMap[row.configType] || row.configType }}</template>
+        </el-table-column>
+        <el-table-column label="发布状态" prop="publishStatus" min-width="110">
+          <template #default="{ row }">
+            <el-tag :type="row.publishStatus === 'PUBLISHED' ? 'success' : 'info'">{{ publishStatusMap[row.publishStatus] || row.publishStatus }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="生效时间" prop="effectiveTime" min-width="170" />
         <el-table-column label="操作" fixed="right" width="160">
           <template #default="{ row }">
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
@@ -45,6 +51,8 @@ import { addCookingConfig, listCookingConfig, publishCookingConfig, updateCookin
 import type { ConfigVO } from '@/api/cooking/config/types';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+const publishStatusMap: Record<string, string> = { PUBLISHED: '已发布', DRAFT: '草稿', UNPUBLISHED: '未发布' };
+const configTypeMap: Record<string, string> = { BUSINESS: '业务', ORDER: '订单', REFUND: '退款', SETTLEMENT: '结算', RESERVE: '预约', MESSAGE: '消息', ANNOUNCEMENT: '公告' };
 const loading = ref(false);
 const rows = ref<ConfigVO[]>([]);
 const total = ref(0);

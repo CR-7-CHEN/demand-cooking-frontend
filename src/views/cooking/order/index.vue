@@ -16,17 +16,21 @@
     </el-card>
 
     <el-card shadow="hover">
-      <el-table v-loading="loading" border :data="rows">
+      <el-table v-loading="loading" border :data="rows" style="width: 100%">
         <el-table-column label="订单号" prop="orderNo" min-width="150" />
-        <el-table-column label="用户" prop="userId" width="110" />
-        <el-table-column label="做饭人员" prop="chefId" width="110" />
-        <el-table-column label="上门时间" prop="serviceStartTime" width="170" />
-        <el-table-column label="状态" width="140">
+        <el-table-column label="做饭人员" min-width="130" show-overflow-tooltip>
+          <template #default="{ row }">{{ chefDisplay(row) }}</template>
+        </el-table-column>
+        <el-table-column label="用户" min-width="120" show-overflow-tooltip>
+          <template #default="{ row }">{{ userDisplay(row) }}</template>
+        </el-table-column>
+        <el-table-column label="上门时间" prop="serviceStartTime" min-width="170" />
+        <el-table-column label="状态" min-width="140">
           <template #default="{ row }"><el-tag>{{ statusText(row.status) }}</el-tag></template>
         </el-table-column>
-        <el-table-column label="报价" prop="quoteAmount" width="100" />
-        <el-table-column label="支付金额" prop="payAmount" width="110" />
-        <el-table-column label="联系人" prop="contactName" width="110" />
+        <el-table-column label="报价" prop="quoteAmount" min-width="100" />
+        <el-table-column label="支付金额" prop="payAmount" min-width="110" />
+        <el-table-column label="联系人" prop="contactName" min-width="110" show-overflow-tooltip />
         <el-table-column label="操作" fixed="right" width="240">
           <template #default="{ row }">
             <el-button link type="primary" icon="View" @click="showDetail(row)">详情</el-button>
@@ -42,6 +46,8 @@
       <el-descriptions :column="2" border>
         <el-descriptions-item label="订单号">{{ current.orderNo }}</el-descriptions-item>
         <el-descriptions-item label="状态">{{ statusText(current.status) }}</el-descriptions-item>
+        <el-descriptions-item label="做饭人员">{{ chefDisplay(current) }}</el-descriptions-item>
+        <el-descriptions-item label="用户">{{ userDisplay(current) }}</el-descriptions-item>
         <el-descriptions-item label="上门时间">{{ current.serviceStartTime }}</el-descriptions-item>
         <el-descriptions-item label="服务区域">{{ current.serviceArea }}</el-descriptions-item>
         <el-descriptions-item label="联系人">{{ current.contactName }}</el-descriptions-item>
@@ -105,6 +111,8 @@ const quickAction = async (row: OrderVO, action: 'pay' | 'confirm') => {
 };
 
 const statusText = (value?: string) => statusOptions.find((item) => item.value === value)?.label || value || '-';
+const chefDisplay = (row: OrderVO) => row.chefName || row.chefId || '-';
+const userDisplay = (row: OrderVO) => row.userName || row.nickName || row.userId || '-';
 
 onMounted(getList);
 </script>

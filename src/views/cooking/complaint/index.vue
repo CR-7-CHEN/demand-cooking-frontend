@@ -8,12 +8,16 @@
       </el-form>
     </el-card>
     <el-card shadow="hover">
-      <el-table v-loading="loading" border :data="rows">
+      <el-table v-loading="loading" border :data="rows" style="width: 100%">
         <el-table-column label="订单号" prop="orderNo" min-width="150" />
-        <el-table-column label="用户" prop="userId" width="110" />
-        <el-table-column label="做饭人员" prop="chefId" width="110" />
-        <el-table-column label="类型" prop="complaintType" width="120" />
-        <el-table-column label="状态" prop="status" width="110" />
+        <el-table-column label="用户" prop="userId" min-width="110" />
+        <el-table-column label="做饭人员" prop="chefId" min-width="110" />
+        <el-table-column label="类型" prop="complaintType" min-width="120" />
+        <el-table-column label="状态" prop="status" min-width="110">
+          <template #default="{ row }">
+            <el-tag :type="complaintStatusType[row.status]">{{ complaintStatusMap[row.status] || row.status }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="内容" prop="content" min-width="240" show-overflow-tooltip />
         <el-table-column label="操作" fixed="right" width="170">
           <template #default="{ row }">
@@ -32,6 +36,8 @@ import { handleComplaint, listComplaint } from '@/api/cooking/complaint';
 import type { ComplaintVO } from '@/api/cooking/complaint/types';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+const complaintStatusMap: Record<string, string> = { PENDING: '待处理', VALID: '成立', INVALID: '不成立' };
+const complaintStatusType: Record<string, string> = { PENDING: 'warning', VALID: 'danger', INVALID: 'info' };
 const loading = ref(false);
 const rows = ref<ComplaintVO[]>([]);
 const total = ref(0);

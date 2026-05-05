@@ -1,164 +1,590 @@
 <template>
   <div class="app-container home">
-    <el-row :gutter="20">
-      <el-col :sm="24" :lg="12" style="padding-left: 20px">
-        <h2>RuoYi-Vue-Plus多租户管理系统</h2>
-        <p>
-          RuoYi-Vue-Plus 是基于 RuoYi-Vue 针对 分布式集群 场景升级(不兼容原框架)
-          <br />
-          * 前端开发框架 Vue3、TS、Element Plus<br />
-          * 后端开发框架 Spring Boot<br />
-          * 容器框架 Undertow 基于 Netty 的高性能容器<br />
-          * 权限认证框架 Sa-Token 支持多终端认证系统<br />
-          * 关系数据库 MySQL 适配 8.X 最低 5.7<br />
-          * 缓存数据库 Redis 适配 6.X 最低 4.X<br />
-          * 数据库框架 Mybatis-Plus 快速 CRUD 增加开发效率<br />
-          * 数据库框架 p6spy 更强劲的 SQL 分析<br />
-          * 多数据源框架 dynamic-datasource 支持主从与多种类数据库异构<br />
-          * 序列化框架 Jackson 统一使用 jackson 高效可靠<br />
-          * Redis客户端 Redisson 性能强劲、API丰富<br />
-          * 分布式限流 Redisson 全局、请求IP、集群ID 多种限流<br />
-          * 分布式锁 Lock4j 注解锁、工具锁 多种多样<br />
-          * 分布式幂等 Lock4j 基于分布式锁实现<br />
-          * 分布式链路追踪 SkyWalking 支持链路追踪、网格分析、度量聚合、可视化<br />
-          * 分布式任务调度 SnailJob 高性能 高可靠 易扩展<br />
-          * 文件存储 Minio 本地存储<br />
-          * 文件存储 七牛、阿里、腾讯 云存储<br />
-          * 监控框架 SpringBoot-Admin 全方位服务监控<br />
-          * 校验框架 Validation 增强接口安全性 严谨性<br />
-          * Excel框架 FastExcel(原Alibaba EasyExcel) 性能优异 扩展性强<br />
-          * 文档框架 SpringDoc、javadoc 无注解零入侵基于java注释<br />
-          * 工具类框架 Hutool、Lombok 减少代码冗余 增加安全性<br />
-          * 代码生成器 适配MP、SpringDoc规范化代码 一键生成前后端代码<br />
-          * 部署方式 Docker 容器编排 一键部署业务集群<br />
-          * 国际化 SpringMessage Spring标准国际化方案<br />
-        </p>
-        <p><b>当前版本:</b> <span>v5.6.1</span></p>
-        <p>
-          <el-tag type="danger">&yen;免费开源</el-tag>
-        </p>
-        <p>
-          <el-button type="primary" icon="Cloudy" plain @click="goTarget('https://gitee.com/dromara/RuoYi-Vue-Plus')">访问码云</el-button>
-          <el-button type="primary" icon="Cloudy" plain @click="goTarget('https://github.com/dromara/RuoYi-Vue-Plus')">访问GitHub</el-button>
-          <el-button type="primary" icon="Cloudy" plain @click="goTarget('https://plus-doc.dromara.org/#/ruoyi-vue-plus/changlog')"
-            >更新日志</el-button
-          >
-        </p>
-      </el-col>
+    <section class="overview-header">
+      <div>
+        <p class="eyebrow">后台首页</p>
+        <h1>运营总览</h1>
+      </div>
+      <div class="today">{{ todayText }}</div>
+    </section>
 
-      <el-col :sm="24" :lg="12" style="padding-left: 20px">
-        <h2>RuoYi-Cloud-Plus多租户微服务管理系统</h2>
-        <p>
-          RuoYi-Cloud-Plus 微服务通用权限管理系统 重写 RuoYi-Cloud 全方位升级(不兼容原框架)
-          <br />
-          * 前端开发框架 Vue3、TS、Element UI<br />
-          * 后端开发框架 Spring Boot<br />
-          * 微服务开发框架 Spring Cloud、Spring Cloud Alibaba<br />
-          * 容器框架 Undertow 基于 XNIO 的高性能容器<br />
-          * 权限认证框架 Sa-Token、Jwt 支持多终端认证系统<br />
-          * 关系数据库 MySQL 适配 8.X 最低 5.7<br />
-          * 关系数据库 Oracle 适配 11g 12c<br />
-          * 关系数据库 PostgreSQL 适配 13 14<br />
-          * 关系数据库 SQLServer 适配 2017 2019<br />
-          * 缓存数据库 Redis 适配 6.X 最低 5.X<br />
-          * 分布式注册中心 Alibaba Nacos 采用2.X 基于GRPC通信高性能<br />
-          * 分布式配置中心 Alibaba Nacos 采用2.X 基于GRPC通信高性能<br />
-          * 服务网关 Spring Cloud Gateway 响应式高性能网关<br />
-          * 负载均衡 Spring Cloud Loadbalancer 负载均衡处理<br />
-          * RPC远程调用 Apache Dubbo 原生态使用体验、高性能<br />
-          * 分布式限流熔断 Alibaba Sentinel 无侵入、高扩展<br />
-          * 分布式事务 Alibaba Seata 无侵入、高扩展 支持 四种模式<br />
-          * 分布式消息队列 Apache Kafka 高性能高速度<br />
-          * 分布式消息队列 Apache RocketMQ 高可用功能多样<br />
-          * 分布式消息队列 RabbitMQ 支持各种扩展插件功能多样性<br />
-          * 分布式搜索引擎 ElasticSearch 业界知名<br />
-          * 分布式链路追踪 Apache SkyWalking 链路追踪、网格分析、度量聚合、可视化<br />
-          * 分布式日志中心 ELK 业界成熟解决方案<br />
-          * 分布式监控 Prometheus、Grafana 全方位性能监控<br />
-          * 其余与 Vue 版本一致<br />
-        </p>
-        <p><b>当前版本:</b> <span>v2.6.1</span></p>
-        <p>
-          <el-tag type="danger">&yen;免费开源</el-tag>
-        </p>
-        <p>
-          <el-button type="primary" icon="Cloudy" plain @click="goTarget('https://gitee.com/dromara/RuoYi-Cloud-Plus')">访问码云</el-button>
-          <el-button type="primary" icon="Cloudy" plain @click="goTarget('https://github.com/dromara/RuoYi-Cloud-Plus')">访问GitHub</el-button>
-          <el-button type="primary" icon="Cloudy" plain @click="goTarget('https://plus-doc.dromara.org/#/ruoyi-cloud-plus/changlog')"
-            >更新日志</el-button
-          >
-        </p>
-      </el-col>
-    </el-row>
-    <el-divider />
+    <section class="stats-grid" aria-label="关键统计">
+      <article v-for="card in statsCards" :key="card.label" class="stat-card" :class="{ primary: card.primary }">
+        <div class="stat-card__label">{{ card.label }}</div>
+        <div class="stat-card__value">
+          {{ card.value }}
+          <span v-if="card.unit">{{ card.unit }}</span>
+        </div>
+        <div class="stat-card__sub">{{ card.sub }}</div>
+      </article>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="panel trend-panel" :class="{ loading: loading }">
+        <div class="panel__header">
+          <div>
+            <h2>营收趋势（近7天）</h2>
+            <p>{{ trendSubtitle }}</p>
+          </div>
+        </div>
+
+        <div class="trend-chart" aria-label="近7天营收柱状图">
+          <div v-for="bar in trendBars" :key="bar.label" class="trend-chart__item">
+            <div class="trend-chart__bar-wrap">
+              <div class="trend-chart__bar" :style="{ height: `${bar.percent}%` }">
+                <span>{{ bar.amount }}</span>
+              </div>
+            </div>
+            <div class="trend-chart__label">{{ bar.label }}</div>
+          </div>
+        </div>
+      </article>
+
+      <aside class="side-panels">
+        <article class="panel">
+          <div class="panel__header compact">
+            <h2>待处理事项</h2>
+          </div>
+          <div class="pending-list">
+            <div v-for="item in pendingItems" :key="item.key" class="pending-item">
+              <span class="pending-item__dot" :class="item.tone"></span>
+              <span class="pending-item__label">{{ item.label }}</span>
+              <strong>{{ formatCount(item.count) }}</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel__header compact">
+            <h2>最新订单</h2>
+          </div>
+          <div v-if="recentOrders.length" class="order-list">
+            <div v-for="order in recentOrders" :key="order.orderNo" class="order-item">
+              <span class="order-item__no">{{ order.orderNo }}</span>
+              <span class="order-item__status" :class="order.tone">{{ order.statusLabel }}</span>
+            </div>
+          </div>
+          <div v-else class="empty-state">暂无最新订单</div>
+        </article>
+      </aside>
+    </section>
   </div>
 </template>
 
 <script setup name="Index" lang="ts">
-const goTarget = (url: string) => {
-  window.open(url, '__blank');
+import { getDashboardOverview } from '@/api/cooking/dashboard';
+import type { DashboardOverviewVO, DashboardPendingItem, DashboardRecentOrder } from '@/api/cooking/dashboard/types';
+import { computed, onMounted, ref } from 'vue';
+
+type DisplayPendingItem = Required<Pick<DashboardPendingItem, 'key' | 'label' | 'count' | 'tone'>>;
+type DisplayRecentOrder = DashboardRecentOrder & { tone: string };
+
+const defaultOverview: DashboardOverviewVO = {
+  todayOrders: 0,
+  todayRevenue: 0,
+  serviceChefCount: 0,
+  resignedChefCount: 0,
+  registeredUserCount: 0,
+  todayNewUserCount: 0,
+  trendMode: 'week',
+  revenueTrend: [],
+  pendingItems: [],
+  recentOrders: []
 };
+
+const defaultPendingItems: DisplayPendingItem[] = [
+  { key: 'chefAudit', label: '厨师审核待处理', count: 0, tone: 'danger' },
+  { key: 'complaintReply', label: '用户投诉待回复', count: 0, tone: 'warning' },
+  { key: 'chefService', label: '厨师待服务', count: 0, tone: 'success' }
+];
+
+const dashboard = ref<DashboardOverviewVO>({ ...defaultOverview });
+const trendMode = ref('week');
+const loading = ref(false);
+let requestSeq = 0;
+
+const todayText = computed(() => {
+  const now = new Date();
+  const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day} ${weekdays[now.getDay()]}`;
+});
+
+const trendSubtitle = '近7天运营收入变化';
+
+const statsCards = computed(() => [
+  { label: '今日订单', value: formatCount(dashboard.value.todayOrders), unit: '单', sub: '今日已创建订单', primary: true },
+  { label: '今日营收', value: formatCurrency(dashboard.value.todayRevenue), unit: '', sub: '已支付订单收入' },
+  { label: '服务中厨师', value: formatCount(dashboard.value.serviceChefCount), unit: '人', sub: '当前可承接服务' },
+  { label: '已离职厨师', value: formatCount(dashboard.value.resignedChefCount), unit: '人', sub: '已退出服务人员' },
+  { label: '注册用户', value: formatCount(dashboard.value.registeredUserCount), unit: '人', sub: `今日新增 +${formatCount(dashboard.value.todayNewUserCount)}` }
+]);
+
+const trendBars = computed(() => {
+  const source = normalizeTrend(dashboard.value.revenueTrend);
+  const maxAmount = Math.max(...source.map((item) => toNumber(item.amount)), 0);
+
+  return source.map((item) => {
+    const amount = toNumber(item.amount);
+    const percent = maxAmount > 0 ? Math.max(Math.round((amount / maxAmount) * 100), 8) : 8;
+    return {
+      label: item.label || item.date || '-',
+      amount: formatTrendAmount(item.amount),
+      percent
+    };
+  });
+});
+
+const pendingItems = computed<DisplayPendingItem[]>(() => {
+  const apiItems = Array.isArray(dashboard.value.pendingItems) ? dashboard.value.pendingItems : [];
+  const used = new Set<DashboardPendingItem>();
+  const baseItems = defaultPendingItems.map((defaultItem) => {
+    const matched = apiItems.find((item) => item.key === defaultItem.key || item.label === defaultItem.label);
+    if (matched) {
+      used.add(matched);
+    }
+    return {
+      ...defaultItem,
+      ...matched,
+      count: toNumber(matched?.count ?? defaultItem.count),
+      tone: matched?.tone || defaultItem.tone
+    };
+  });
+
+  const extraItems = apiItems
+    .filter((item) => !used.has(item))
+    .map((item, index) => ({
+      key: item.key || `pending-${index}`,
+      label: item.label || '-',
+      count: toNumber(item.count),
+      tone: item.tone || 'info'
+    }));
+
+  return [...baseItems, ...extraItems];
+});
+
+const recentOrders = computed<DisplayRecentOrder[]>(() => {
+  const orders = Array.isArray(dashboard.value.recentOrders) ? dashboard.value.recentOrders : [];
+  return orders.map((order) => ({
+    ...order,
+    orderNo: order.orderNo || '-',
+    statusLabel: order.statusLabel || order.status || '-',
+    tone: orderTone(order.status)
+  }));
+});
+
+const loadDashboard = async () => {
+  const seq = ++requestSeq;
+  loading.value = true;
+  try {
+    const res = (await getDashboardOverview({ trendMode: trendMode.value })) as any;
+    if (seq !== requestSeq) return;
+    const data = (res?.data || res || {}) as Partial<DashboardOverviewVO>;
+    dashboard.value = {
+      ...defaultOverview,
+      ...data,
+      trendMode: data.trendMode || trendMode.value,
+      revenueTrend: Array.isArray(data.revenueTrend) ? data.revenueTrend : [],
+      pendingItems: Array.isArray(data.pendingItems) ? data.pendingItems : [],
+      recentOrders: Array.isArray(data.recentOrders) ? data.recentOrders : []
+    };
+  } catch (error) {
+    if (seq === requestSeq) {
+      dashboard.value = { ...defaultOverview, trendMode: trendMode.value };
+      console.warn('Dashboard overview load failed:', error);
+    }
+  } finally {
+    if (seq === requestSeq) {
+      loading.value = false;
+    }
+  }
+};
+
+const normalizeTrend = (items: DashboardOverviewVO['revenueTrend']) => {
+  const safeItems = Array.isArray(items) ? items.slice(0, 7) : [];
+  const placeholders = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+
+  return Array.from({ length: 7 }, (_, index) => ({
+    label: safeItems[index]?.label || safeItems[index]?.date || placeholders[index],
+    date: safeItems[index]?.date,
+    amount: safeItems[index]?.amount ?? 0
+  }));
+};
+
+const toNumber = (value: number | string | undefined | null) => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  if (typeof value === 'string') {
+    const parsed = Number(value.replace(/[^\d.-]/g, ''));
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+};
+
+const formatCount = (value: number | string | undefined | null) => new Intl.NumberFormat('zh-CN').format(toNumber(value));
+
+const formatCurrency = (value: number | string | undefined | null) => `¥${new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 2 }).format(toNumber(value))}`;
+
+const formatTrendAmount = (value: number | string | undefined | null) => {
+  const amount = toNumber(value);
+  if (Math.abs(amount) >= 1000) {
+    return `¥${(amount / 1000).toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return formatCurrency(amount);
+};
+
+const orderTone = (status?: string) => {
+  const normalized = (status || '').toUpperCase();
+  if (['COMPLETED', 'CONFIRMED', 'PAID'].some((item) => normalized.includes(item))) return 'success';
+  if (['WAITING', 'PENDING', 'REFUND'].some((item) => normalized.includes(item))) return 'warning';
+  if (['CANCEL', 'REJECT', 'FAIL'].some((item) => normalized.includes(item))) return 'danger';
+  return 'progress';
+};
+
+onMounted(loadDashboard);
 </script>
 
 <style lang="scss" scoped>
 .home {
-  blockquote {
-    padding: 10px 20px;
-    margin: 0 0 20px;
-    font-size: 17.5px;
-    border-left: 5px solid #eee;
-  }
-  hr {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    border: 0;
-    border-top: 1px solid #eee;
-  }
-  .col-item {
-    margin-bottom: 20px;
-  }
-
-  ul {
-    padding: 0;
-    margin: 0;
-  }
-
-  font-family: 'open sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 13px;
-  color: #676a6c;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: clamp(12px, 2vw, 24px);
   overflow-x: hidden;
+  color: #2f2a24;
+  background: #f6f3ef;
+}
 
-  ul {
-    list-style-type: none;
+.overview-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  h1 {
+    margin: 2px 0 0;
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 700;
+    line-height: 1.2;
   }
+}
 
-  h4 {
-    margin-top: 0px;
+.eyebrow,
+.today,
+.panel__header p,
+.stat-card__label,
+.stat-card__sub,
+.trend-chart__label,
+.empty-state {
+  color: #7a7168;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 13px;
+}
+
+.today {
+  font-size: 14px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 14px;
+}
+
+.stat-card,
+.panel {
+  min-width: 0;
+  border: 1px solid #e4ddd4;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgb(47 42 36 / 5%);
+}
+
+.stat-card {
+  padding: 16px;
+
+  &.primary {
+    border-color: #d86f47;
+    color: #fff;
+    background: #df7b50;
+
+    .stat-card__label,
+    .stat-card__sub,
+    .stat-card__value span {
+      color: #fff4ed;
+    }
+  }
+}
+
+.stat-card__label {
+  font-size: 13px;
+}
+
+.stat-card__value {
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+  font-size: clamp(24px, 3.4vw, 32px);
+  font-weight: 700;
+  line-height: 1.1;
+
+  span {
+    margin-left: 4px;
+    color: #7a7168;
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+.stat-card__sub {
+  min-height: 18px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 14px;
+  min-width: 0;
+}
+
+.panel {
+  padding: clamp(14px, 2vw, 18px);
+}
+
+.trend-panel.loading {
+  opacity: 0.86;
+}
+
+.panel__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+
+  &.compact {
+    margin-bottom: 10px;
   }
 
   h2 {
-    margin-top: 10px;
-    font-size: 26px;
-    font-weight: 100;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.3;
   }
 
   p {
-    margin-top: 10px;
+    margin: 4px 0 0;
+    font-size: 12px;
+  }
+}
 
-    b {
-      font-weight: 700;
-    }
+.trend-chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(32px, 1fr));
+  gap: clamp(8px, 2vw, 18px);
+  min-width: 0;
+  height: clamp(230px, 34vw, 330px);
+  padding: 12px 4px 0;
+}
+
+.trend-chart__item {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) 22px;
+  min-width: 0;
+}
+
+.trend-chart__bar-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 0;
+  border-bottom: 1px solid #ebe3da;
+}
+
+.trend-chart__bar {
+  position: relative;
+  width: min(72%, 46px);
+  min-height: 24px;
+  border-radius: 6px 6px 0 0;
+  background: #c8b89a;
+  transition: height 0.2s ease;
+
+  span {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    color: #6c6258;
+    font-size: 11px;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+}
+
+.trend-chart__item:nth-child(6) .trend-chart__bar {
+  background: #df7b50;
+}
+
+.trend-chart__label {
+  padding-top: 6px;
+  overflow: hidden;
+  font-size: 12px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.side-panels {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.pending-list,
+.order-list {
+  display: grid;
+  gap: 8px;
+}
+
+.pending-item,
+.order-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px dashed #ece5dc;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.pending-item__dot {
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  &.danger {
+    background: #df7b50;
   }
 
-  .update-log {
-    ol {
-      display: block;
-      list-style-type: decimal;
-      margin-block-start: 1em;
-      margin-block-end: 1em;
-      margin-inline-start: 0;
-      margin-inline-end: 0;
-      padding-inline-start: 40px;
+  &.warning {
+    background: #d0a448;
+  }
+
+  &.success {
+    background: #67a66a;
+  }
+
+  &.info {
+    background: #8aa0b2;
+  }
+}
+
+.pending-item__label,
+.order-item__no {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pending-item__label {
+  flex: 1;
+}
+
+.pending-item strong {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  color: #fff;
+  background: #df7b50;
+  font-size: 13px;
+}
+
+.order-item {
+  justify-content: space-between;
+}
+
+.order-item__status {
+  flex: 0 0 auto;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+
+  &.progress {
+    color: #c8613f;
+    background: #fff0e8;
+  }
+
+  &.success {
+    color: #4f8f52;
+    background: #eef8ef;
+  }
+
+  &.warning {
+    color: #a37822;
+    background: #fff8df;
+  }
+
+  &.danger {
+    color: #b95050;
+    background: #fff0f0;
+  }
+}
+
+.empty-state {
+  padding: 24px 0 12px;
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .side-panels {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .home {
+    padding: 12px;
+  }
+
+  .stats-grid,
+  .side-panels {
+    grid-template-columns: 1fr;
+  }
+
+  .trend-chart {
+    gap: 6px;
+    height: 230px;
+  }
+
+  .trend-chart__bar {
+    width: 80%;
+
+    span {
+      display: none;
     }
   }
 }

@@ -26,7 +26,10 @@ export interface OrderVO extends CookingBaseForm {
   orderId?: string | number;
   orderNo?: string;
   userId?: string | number;
+  userName?: string;
+  nickName?: string;
   chefId?: string | number;
+  chefName?: string;
   contactName?: string;
   contactPhone?: string;
   serviceArea?: string;
@@ -43,6 +46,8 @@ export interface DishVO extends CookingBaseForm {
   cuisine?: string;
   status?: string;
   sort?: number;
+  imageUrl?: string;
+  description?: string;
 }
 
 export interface ComplaintVO extends CookingBaseForm {
@@ -51,6 +56,7 @@ export interface ComplaintVO extends CookingBaseForm {
   orderNo?: string;
   userId?: string | number;
   chefId?: string | number;
+  chefName?: string;
   complaintType?: string;
   status?: string;
 }
@@ -58,6 +64,7 @@ export interface ComplaintVO extends CookingBaseForm {
 export interface SettlementVO extends CookingBaseForm {
   settlementId?: string | number;
   chefId?: string | number;
+  chefName?: string;
   settlementMonth?: string;
   orderCount?: number;
   orderAmount?: number;

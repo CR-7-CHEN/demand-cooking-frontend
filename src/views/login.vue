@@ -1,16 +1,16 @@
 <template>
   <div class="login">
+    <div class="bg-icons">
+      <span class="bg-icon icon-1">🍳</span>
+      <span class="bg-icon icon-2">🔪</span>
+      <span class="bg-icon icon-3">👨‍🍳</span>
+      <span class="bg-icon icon-4">🥘</span>
+      <span class="bg-icon icon-5">🍲</span>
+    </div>
     <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
       <div class="title-box">
         <h3 class="title">{{ title }}</h3>
-        <lang-select />
       </div>
-      <el-form-item v-if="tenantEnabled" prop="tenantId">
-        <el-select v-model="loginForm.tenantId" filterable :placeholder="proxy.$t('login.selectPlaceholder')" style="width: 100%">
-          <el-option v-for="item in tenantList" :key="item.tenantId" :label="item.companyName" :value="item.tenantId"></el-option>
-          <template #prefix><svg-icon icon-class="company" class="el-input__icon input-icon" /></template>
-        </el-select>
-      </el-form-item>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" size="large" auto-complete="off" :placeholder="proxy.$t('login.username')">
           <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
@@ -44,23 +44,6 @@
         </div>
       </el-form-item>
       <el-checkbox v-model="loginForm.rememberMe" style="margin: 0 0 25px 0">{{ proxy.$t('login.rememberPassword') }}</el-checkbox>
-      <el-form-item style="float: right">
-        <el-button circle :title="proxy.$t('login.social.wechat')" @click="doSocialLogin('wechat')">
-          <svg-icon icon-class="wechat" />
-        </el-button>
-        <el-button circle :title="proxy.$t('login.social.maxkey')" @click="doSocialLogin('maxkey')">
-          <svg-icon icon-class="maxkey" />
-        </el-button>
-        <el-button circle :title="proxy.$t('login.social.topiam')" @click="doSocialLogin('topiam')">
-          <svg-icon icon-class="topiam" />
-        </el-button>
-        <el-button circle :title="proxy.$t('login.social.gitee')" @click="doSocialLogin('gitee')">
-          <svg-icon icon-class="gitee" />
-        </el-button>
-        <el-button circle :title="proxy.$t('login.social.github')" @click="doSocialLogin('github')">
-          <svg-icon icon-class="github" />
-        </el-button>
-      </el-form-item>
       <el-form-item style="width: 100%">
         <el-button :loading="loading" size="large" type="primary" style="width: 100%" @click.prevent="handleLogin">
           <span v-if="!loading">{{ proxy.$t('login.login') }}</span>
@@ -71,20 +54,17 @@
         </div>
       </el-form-item>
     </el-form>
-    <!--  底部  -->
     <div class="el-login-footer">
-      <span>Copyright © 2018-2026 疯狂的狮子Li All Rights Reserved.</span>
+      <span>让美味上门，让生活更简单</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getCodeImg, getTenantList } from '@/api/login';
-import { authRouterUrl } from '@/api/system/social/auth';
+import { getCodeImg } from '@/api/login';
 import { useUserStore } from '@/store/modules/user';
-import { LoginData, TenantVO } from '@/api/types';
+import { LoginData } from '@/api/types';
 import { to } from 'await-to-js';
-import { HttpStatus } from '@/enums/RespEnum';
 import { useI18n } from 'vue-i18n';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
@@ -93,18 +73,18 @@ const title = import.meta.env.VITE_APP_TITLE;
 const userStore = useUserStore();
 const router = useRouter();
 const { t } = useI18n();
+const DEFAULT_LOGIN_SCOPE = '000000';
 
 const loginForm = ref<LoginData>({
-  tenantId: '000000',
-  username: 'admin',
-  password: 'admin123',
+  tenantId: DEFAULT_LOGIN_SCOPE,
+  username: '',
+  password: '',
   rememberMe: false,
   code: '',
   uuid: ''
 } as LoginData);
 
 const loginRules: ElFormRules = {
-  tenantId: [{ required: true, trigger: 'blur', message: t('login.rule.tenantId.required') }],
   username: [{ required: true, trigger: 'blur', message: t('login.rule.username.required') }],
   password: [{ required: true, trigger: 'blur', message: t('login.rule.password.required') }],
   code: [{ required: true, trigger: 'change', message: t('login.rule.code.required') }]
@@ -114,15 +94,11 @@ const codeUrl = ref('');
 const loading = ref(false);
 // 验证码开关
 const captchaEnabled = ref(true);
-// 租户开关
-const tenantEnabled = ref(true);
 
 // 注册开关
 const register = ref(false);
 const redirect = ref('/');
 const loginRef = ref<ElFormInstance>();
-// 租户列表
-const tenantList = ref<TenantVO[]>([]);
 
 watch(
   () => router.currentRoute.value,
@@ -136,9 +112,10 @@ const handleLogin = () => {
   loginRef.value?.validate(async (valid: boolean, fields: any) => {
     if (valid) {
       loading.value = true;
+      loginForm.value.tenantId = DEFAULT_LOGIN_SCOPE;
+      localStorage.removeItem('tenantId');
       // 勾选了需要记住密码设置在 localStorage 中设置记住用户名和密码
       if (loginForm.value.rememberMe) {
-        localStorage.setItem('tenantId', String(loginForm.value.tenantId));
         localStorage.setItem('username', String(loginForm.value.username));
         localStorage.setItem('password', String(loginForm.value.password));
         localStorage.setItem('rememberMe', String(loginForm.value.rememberMe));
@@ -184,50 +161,21 @@ const getCode = async () => {
 };
 
 const getLoginData = () => {
-  const tenantId = localStorage.getItem('tenantId');
   const username = localStorage.getItem('username');
   const password = localStorage.getItem('password');
   const rememberMe = localStorage.getItem('rememberMe');
+  localStorage.removeItem('tenantId');
   loginForm.value = {
-    tenantId: tenantId === null ? String(loginForm.value.tenantId) : tenantId,
+    ...loginForm.value,
+    tenantId: DEFAULT_LOGIN_SCOPE,
     username: username === null ? String(loginForm.value.username) : username,
     password: password === null ? String(loginForm.value.password) : String(password),
-    rememberMe: rememberMe === null ? false : Boolean(rememberMe)
+    rememberMe: rememberMe === 'true'
   } as LoginData;
-};
-
-/**
- * 获取租户列表
- */
-const initTenantList = async () => {
-  const { data } = await getTenantList(false);
-  tenantEnabled.value = data.tenantEnabled === undefined ? true : data.tenantEnabled;
-  if (tenantEnabled.value) {
-    tenantList.value = data.voList;
-    if (tenantList.value != null && tenantList.value.length !== 0) {
-      loginForm.value.tenantId = tenantList.value[0].tenantId;
-    }
-  }
-};
-
-/**
- * 第三方登录
- * @param type
- */
-const doSocialLogin = (type: string) => {
-  authRouterUrl(type, loginForm.value.tenantId).then((res: any) => {
-    if (res.code === HttpStatus.SUCCESS) {
-      // 获取授权地址跳转
-      window.location.href = res.data;
-    } else {
-      ElMessage.error(res.msg);
-    }
-  });
 };
 
 onMounted(() => {
   getCode();
-  initTenantList();
   getLoginData();
 });
 </script>
@@ -237,41 +185,100 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
   height: 100%;
-  background-image: url('../assets/images/login-background.jpg');
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
+  background:
+    linear-gradient(120deg, rgba(84, 125, 95, 0.16) 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(145deg, #eef3e9 0%, #f7f3ea 52%, #f8e1c2 100%);
+}
+
+.bg-icons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-icon {
+  position: absolute;
+  font-size: 64px;
+  opacity: 0.3;
+  user-select: none;
+}
+
+.icon-1 {
+  top: 8%;
+  left: 6%;
+  font-size: 80px;
+  transform: rotate(-15deg);
+}
+
+.icon-2 {
+  top: 18%;
+  right: 8%;
+  font-size: 60px;
+  transform: rotate(20deg);
+}
+
+.icon-3 {
+  bottom: 22%;
+  left: 10%;
+  font-size: 72px;
+  transform: rotate(-8deg);
+}
+
+.icon-4 {
+  bottom: 10%;
+  right: 12%;
+  font-size: 68px;
+  transform: rotate(12deg);
+}
+
+.icon-5 {
+  top: 50%;
+  right: 28%;
+  font-size: 56px;
+  transform: rotate(-22deg);
+}
+
+.login::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58) 0%, rgba(255, 255, 255, 0.12) 46%, rgba(214, 107, 42, 0.08) 100%),
+    repeating-linear-gradient(90deg, rgba(84, 125, 95, 0.08) 0 1px, transparent 1px 96px);
+  pointer-events: none;
 }
 
 .title-box {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  margin-bottom: 26px;
 
   .title {
-    margin: 0px auto 26px auto;
-    text-align: center;
-    color: var(--el-text-color-primary);
+    margin: 0;
+    color: #2f3f32;
+    font-size: 21px;
     font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-
-  :deep(.lang-select--style) {
-    line-height: 0;
-    color: var(--el-text-color-secondary);
+    line-height: 1.3;
+    letter-spacing: 0;
   }
 }
 
 .login-form {
   border-radius: var(--app-radius-lg);
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  width: min(420px, 90vw);
-  padding: 32px 30px 12px 30px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  width: min(424px, 90vw);
+  padding: 34px 32px 14px 32px;
   z-index: 1;
-  box-shadow: var(--app-shadow-lg);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 24px 70px rgba(47, 63, 50, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   .el-input {
     height: 40px;
     input {
@@ -293,27 +300,23 @@ onMounted(() => {
 }
 
 .login-form :deep(.el-input__wrapper) {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 0 1px rgba(84, 125, 95, 0.12) inset;
 }
 
 .login-form :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 2px rgba(214, 107, 42, 0.22);
 }
 
 .login-form :deep(.el-button--primary) {
   border-radius: var(--app-radius-md);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+  background: linear-gradient(135deg, #c95f23, #d98238);
+  border: none;
+  box-shadow: 0 10px 24px rgba(214, 107, 42, 0.3);
 }
 
-.login-form :deep(.el-button.is-circle) {
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  color: var(--el-text-color-regular);
-}
-
-.login-form :deep(.el-button.is-circle:hover) {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.2);
+.login-form :deep(.el-button--primary:hover) {
+  background: linear-gradient(135deg, #b95520, #d1742e);
 }
 
 .login-code {
@@ -324,8 +327,8 @@ onMounted(() => {
   box-sizing: border-box;
   border-radius: var(--app-radius-sm);
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--el-border-color-light);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(84, 125, 95, 0.12);
 
   img {
     cursor: pointer;
@@ -344,10 +347,11 @@ onMounted(() => {
   bottom: 0;
   width: 100%;
   text-align: center;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(47, 63, 50, 0.85);
   font-family: Arial, serif;
+  font-weight: 500;
   font-size: 12px;
-  letter-spacing: 1px;
+  letter-spacing: 0;
 }
 
 .login-code-img {
@@ -361,18 +365,20 @@ onMounted(() => {
     border-color: rgba(148, 163, 184, 0.2);
   }
 
-  .login-form :deep(.el-input__wrapper) {
-    background-color: rgba(17, 24, 39, 0.7);
+  .title-box {
+    .title {
+      color: #f8fafc;
+    }
+
   }
 
-  .login-form :deep(.el-button.is-circle) {
-    background: rgba(148, 163, 184, 0.12);
-    border-color: rgba(148, 163, 184, 0.25);
-    color: #e5e7eb;
+  .login-form :deep(.el-input__wrapper) {
+    background-color: rgba(17, 24, 39, 0.7);
+    box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.18) inset;
   }
 
   .el-login-footer {
-    color: rgba(226, 232, 240, 0.65);
+    color: rgba(226, 232, 240, 0.62);
   }
 }
 </style>
