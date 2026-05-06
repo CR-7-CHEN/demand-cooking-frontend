@@ -56,6 +56,9 @@ describe('cooking dynamic menu pages', () => {
     const dishPage = readPage('dish');
 
     expect(chefTable).toContain('label="服务区域"');
+    expect(chefTable).toContain('label="性别"');
+    expect(chefTable).toContain('genderText(row.gender)');
+    expect(readPage('chef')).toContain('v-model="form.gender"');
     expect(orderTable.indexOf('label="订单号"')).toBeLessThan(orderTable.indexOf('label="做饭人员"'));
     expect(dishPage).toContain('<ImageUpload v-model="form.imageUrl" :limit="1"');
     expect(dishPage).not.toContain('<el-input v-model="form.imageUrl"');

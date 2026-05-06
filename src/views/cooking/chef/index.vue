@@ -27,6 +27,9 @@
     <el-card shadow="hover">
       <el-table v-loading="loading" border :data="rows" style="width: 100%">
         <el-table-column label="姓名" prop="chefName" min-width="120" />
+        <el-table-column label="性别" min-width="90">
+          <template #default="{ row }">{{ genderText(row.gender) }}</template>
+        </el-table-column>
         <el-table-column label="手机号" prop="mobile" min-width="130" />
         <el-table-column label="服务区域" prop="areaName" min-width="140" show-overflow-tooltip />
         <el-table-column label="可预约时间" prop="availableTimeText" min-width="220" show-overflow-tooltip />
@@ -60,6 +63,7 @@
         <el-row :gutter="12">
           <el-col :span="12"><el-form-item label="姓名"><el-input v-model="form.chefName" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="手机号"><el-input v-model="form.mobile" /></el-form-item></el-col>
+          <el-col :span="12"><el-form-item label="性别"><el-select v-model="form.gender"><el-option label="男" value="0" /><el-option label="女" value="1" /><el-option label="未知" value="2" /></el-select></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="区域"><el-input v-model="form.areaName" /></el-form-item></el-col>
           <el-col :span="12"><el-form-item label="底薪"><el-input-number v-model="form.baseSalary" :min="0" class="w-full" /></el-form-item></el-col>
           <el-col :span="24"><el-form-item label="擅长菜系"><el-input v-model="form.skillTags" /></el-form-item></el-col>
@@ -104,6 +108,7 @@ const resetQuery = () => {
 
 const handleAdd = () => {
   Object.keys(form).forEach((key) => delete form[key]);
+  form.gender = '2';
   form.chefStatus = '0';
   dialog.title = '新增做饭人员';
   dialog.visible = true;
@@ -136,6 +141,7 @@ const handleStatus = async (row: ChefVO, chefStatus: string) => {
 
 const auditText = (value?: string) => ({ '0': '待审核', '1': '通过', '2': '驳回', PENDING: '待审核', APPROVED: '通过', REJECTED: '驳回' })[value || ''] || value || '-';
 const statusText = (value?: string) => ({ '0': '可接单', '1': '暂停', '2': '禁用', '3': '离职', APPROVED: '可接单', PAUSED: '暂停', DISABLED: '禁用', RESIGNED: '离职' })[value || ''] || value || '-';
+const genderText = (value?: string) => ({ '0': '男', '1': '女', '2': '未知' })[value || ''] || '-';
 
 onMounted(getList);
 </script>

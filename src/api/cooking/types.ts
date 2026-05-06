@@ -10,6 +10,7 @@ export interface ChefVO extends CookingBaseForm {
   chefId?: string | number;
   userId?: string | number;
   chefName?: string;
+  gender?: string;
   mobile?: string;
   areaName?: string;
   skillTags?: string;

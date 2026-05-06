@@ -130,7 +130,7 @@ const trendBars = computed(() => {
     const amount = toNumber(item.amount);
     const percent = maxAmount > 0 ? Math.max(Math.round((amount / maxAmount) * 100), 8) : 8;
     return {
-      label: item.label || item.date || '-',
+      label: item.date ? formatTrendDate(item.date) : item.label || '-',
       amount: formatTrendAmount(item.amount),
       percent
     };
@@ -202,12 +202,45 @@ const loadDashboard = async () => {
   }
 };
 
+const parseTrendDate = (value?: string) => {
+  if (!value) return null;
+  const normalized = value.trim();
+  const match = normalized.match(/^(\d{4})[-/](\d{2})[-/](\d{2})$/);
+  if (match) {
+    const [, year, month, day] = match;
+    return new Date(Number(year), Number(month) - 1, Number(day));
+  }
+  const parsed = new Date(normalized);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const formatMonthDay = (date: Date) => {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${month}.${day}`;
+};
+
+const formatTrendDate = (value?: string) => {
+  const date = parseTrendDate(value);
+  return date ? formatMonthDay(date) : '';
+};
+
+const buildRecentTrendLabels = (length: number) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Array.from({ length }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - (length - 1 - index));
+    return formatMonthDay(date);
+  });
+};
+
 const normalizeTrend = (items: DashboardOverviewVO['revenueTrend']) => {
   const safeItems = Array.isArray(items) ? items.slice(0, 7) : [];
-  const placeholders = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+  const fallbackLabels = buildRecentTrendLabels(7);
 
   return Array.from({ length: 7 }, (_, index) => ({
-    label: safeItems[index]?.label || safeItems[index]?.date || placeholders[index],
+    label: safeItems[index]?.date ? formatTrendDate(safeItems[index].date) : safeItems[index]?.label || fallbackLabels[index],
     date: safeItems[index]?.date,
     amount: safeItems[index]?.amount ?? 0
   }));
