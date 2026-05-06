@@ -20,6 +20,17 @@ export interface ChefVO extends CookingBaseForm {
   recommendFlag?: string;
   auditStatus?: string;
   chefStatus?: string;
+  availableTimeText?: string;
+  availableTimes?: ChefTimeVO[];
+}
+
+export interface ChefTimeVO extends CookingBaseForm {
+  timeId?: string | number;
+  chefId?: string | number;
+  startTime?: string;
+  endTime?: string;
+  status?: string;
+  remark?: string;
 }
 
 export interface OrderVO extends CookingBaseForm {

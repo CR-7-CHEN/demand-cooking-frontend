@@ -29,6 +29,7 @@
         <el-table-column label="姓名" prop="chefName" min-width="120" />
         <el-table-column label="手机号" prop="mobile" min-width="130" />
         <el-table-column label="服务区域" prop="areaName" min-width="140" show-overflow-tooltip />
+        <el-table-column label="可预约时间" prop="availableTimeText" min-width="220" show-overflow-tooltip />
         <el-table-column label="擅长" prop="skillTags" min-width="160" show-overflow-tooltip />
         <el-table-column label="健康证到期" prop="healthCertExpireDate" min-width="160" />
         <el-table-column label="评分" prop="rating" min-width="90" />
