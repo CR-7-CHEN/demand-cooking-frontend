@@ -39,7 +39,6 @@
         <el-form-item label="配置键"><el-input v-model="form.configKey" /></el-form-item>
         <el-form-item label="配置值"><el-input v-model="form.configValue" type="textarea" /></el-form-item>
         <el-form-item label="配置类型"><el-input v-model="form.configType" /></el-form-item>
-        <el-form-item label="公告内容"><el-input v-model="form.announcementContent" type="textarea" /></el-form-item>
       </el-form>
       <template #footer><el-button @click="dialog.visible = false">取消</el-button><el-button type="primary" @click="submit">保存</el-button></template>
     </el-dialog>
@@ -52,7 +51,7 @@ import type { ConfigVO } from '@/api/cooking/config/types';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 const publishStatusMap: Record<string, string> = { PUBLISHED: '已发布', DRAFT: '草稿', UNPUBLISHED: '未发布' };
-const configTypeMap: Record<string, string> = { BUSINESS: '业务', ORDER: '订单', REFUND: '退款', SETTLEMENT: '结算', RESERVE: '预约', MESSAGE: '消息', ANNOUNCEMENT: '公告' };
+const configTypeMap: Record<string, string> = { BUSINESS: '业务', ORDER: '订单', REFUND: '退款', SETTLEMENT: '结算', RESERVE: '预约', MESSAGE: '消息' };
 const loading = ref(false);
 const rows = ref<ConfigVO[]>([]);
 const total = ref(0);
@@ -63,7 +62,7 @@ const dialog = reactive({ visible: false, title: '' });
 const getList = async () => {
   loading.value = true;
   const res: any = await listCookingConfig(queryParams);
-  rows.value = res.rows || res.data || [];
+  rows.value = (res.rows || res.data || []).filter((item: ConfigVO) => item?.configType !== 'ANNOUNCEMENT');
   total.value = res.total || rows.value.length;
   loading.value = false;
 };

@@ -11,9 +11,13 @@ export interface ChefVO extends CookingBaseForm {
   userId?: string | number;
   chefName?: string;
   gender?: string;
+  age?: number;
   mobile?: string;
+  avatarUrl?: string;
+  workImageUrls?: string;
   areaName?: string;
   skillTags?: string;
+  healthCertImageUrl?: string;
   healthCertExpireDate?: string;
   baseSalary?: number;
   rating?: number;
@@ -21,6 +25,7 @@ export interface ChefVO extends CookingBaseForm {
   recommendFlag?: string;
   auditStatus?: string;
   chefStatus?: string;
+  resignReason?: string;
   availableTimeText?: string;
   availableTimes?: ChefTimeVO[];
 }

@@ -81,7 +81,7 @@
         <el-descriptions-item label="订单ID">{{ current.orderId || '-' }}</el-descriptions-item>
         <el-descriptions-item label="用户">{{ userDisplay(current) }}</el-descriptions-item>
         <el-descriptions-item label="厨师姓名">{{ chefDisplay(current) }}</el-descriptions-item>
-        <el-descriptions-item label="评分">{{ current.rating || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="评分">{{ displayRating(current.rating) }}</el-descriptions-item>
         <el-descriptions-item label="投诉调整">{{ adjustedText(current.complaintAdjusted) }}</el-descriptions-item>
         <el-descriptions-item label="评价时间">{{ formatTime(current.reviewTime || current.createTime) }}</el-descriptions-item>
         <el-descriptions-item label="更新时间">{{ formatTime(current.updateTime) }}</el-descriptions-item>
@@ -176,6 +176,7 @@ const displayStatusText = (value?: string) => displayStatusOptions.find((item) =
 const displayStatusTag = (value?: string): DisplayStatusTagType => displayStatusOptions.find((item) => item.value === value)?.type || 'info';
 
 const adjustedText = (value?: string) => ({ Y: '是', N: '否' })[String(value || '').toUpperCase()] || value || '-';
+const displayRating = (value?: number | string) => (value === 0 || value === '0' ? value : (value !== undefined && value !== null && value !== '' ? value : '-'));
 
 const formatTime = (value?: string) => proxy?.parseTime(value) || '-';
 const userDisplay = (row: ReviewVO) => row.userName || row.nickName || row.userId || '-';
