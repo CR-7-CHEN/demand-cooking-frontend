@@ -1,9 +1,9 @@
 import request from '@/utils/request';
 import { AxiosPromise } from 'axios';
-import { LoginData, LoginResult, VerifyCodeResult, TenantInfo } from './types';
+import { LoginData, LoginResult, VerifyCodeResult } from './types';
 import { UserInfo } from '@/api/system/user/types';
 
-// pc端固定客户端授权id
+// pc绔浐瀹氬鎴风鎺堟潈id
 const clientId = import.meta.env.VITE_APP_CLIENT_ID;
 
 /**
@@ -28,7 +28,7 @@ export function login(data: LoginData): AxiosPromise<LoginResult> {
   });
 }
 
-// 注册方法
+// 娉ㄥ唽鏂规硶
 export function register(data: any) {
   const params = {
     ...data,
@@ -48,7 +48,7 @@ export function register(data: any) {
 }
 
 /**
- * 注销
+ * 娉ㄩ攢
  */
 export function logout() {
   if (import.meta.env.VITE_APP_SSE === 'true') {
@@ -64,7 +64,7 @@ export function logout() {
 }
 
 /**
- * 获取验证码
+ * 鑾峰彇楠岃瘉鐮?
  */
 export function getCodeImg(): AxiosPromise<VerifyCodeResult> {
   return request({
@@ -78,7 +78,7 @@ export function getCodeImg(): AxiosPromise<VerifyCodeResult> {
 }
 
 /**
- * 第三方登录
+ * 绗笁鏂圭櫥褰?
  */
 export function callback(data: LoginData): AxiosPromise<any> {
   const LoginData = {
@@ -93,21 +93,10 @@ export function callback(data: LoginData): AxiosPromise<any> {
   });
 }
 
-// 获取用户详细信息
+// 鑾峰彇鐢ㄦ埛璇︾粏淇℃伅
 export function getInfo(): AxiosPromise<UserInfo> {
   return request({
     url: '/system/user/getInfo',
-    method: 'get'
-  });
-}
-
-// 获取租户列表
-export function getTenantList(isToken: boolean): AxiosPromise<TenantInfo> {
-  return request({
-    url: '/auth/tenant/list',
-    headers: {
-      isToken: isToken
-    },
     method: 'get'
   });
 }

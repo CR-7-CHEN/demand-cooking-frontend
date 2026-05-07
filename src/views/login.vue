@@ -73,10 +73,8 @@ const title = import.meta.env.VITE_APP_TITLE;
 const userStore = useUserStore();
 const router = useRouter();
 const { t } = useI18n();
-const DEFAULT_LOGIN_SCOPE = '000000';
 
 const loginForm = ref<LoginData>({
-  tenantId: DEFAULT_LOGIN_SCOPE,
   username: '',
   password: '',
   rememberMe: false,
@@ -112,8 +110,6 @@ const handleLogin = () => {
   loginRef.value?.validate(async (valid: boolean, fields: any) => {
     if (valid) {
       loading.value = true;
-      loginForm.value.tenantId = DEFAULT_LOGIN_SCOPE;
-      localStorage.removeItem('tenantId');
       // 勾选了需要记住密码设置在 localStorage 中设置记住用户名和密码
       if (loginForm.value.rememberMe) {
         localStorage.setItem('username', String(loginForm.value.username));
@@ -121,7 +117,6 @@ const handleLogin = () => {
         localStorage.setItem('rememberMe', String(loginForm.value.rememberMe));
       } else {
         // 否则移除
-        localStorage.removeItem('tenantId');
         localStorage.removeItem('username');
         localStorage.removeItem('password');
         localStorage.removeItem('rememberMe');
@@ -164,10 +159,8 @@ const getLoginData = () => {
   const username = localStorage.getItem('username');
   const password = localStorage.getItem('password');
   const rememberMe = localStorage.getItem('rememberMe');
-  localStorage.removeItem('tenantId');
   loginForm.value = {
     ...loginForm.value,
-    tenantId: DEFAULT_LOGIN_SCOPE,
     username: username === null ? String(loginForm.value.username) : username,
     password: password === null ? String(loginForm.value.password) : String(password),
     rememberMe: rememberMe === 'true'

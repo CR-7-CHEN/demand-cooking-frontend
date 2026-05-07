@@ -10,6 +10,12 @@ describe('login page has no tenant-facing state', () => {
     expect(loginVue).not.toContain("localStorage.setItem('tenantId'");
   });
 
+  it('does not seed a tenant id into the login form', () => {
+    expect(loginVue).not.toContain('tenantId: DEFAULT_LOGIN_SCOPE');
+    expect(loginVue).not.toContain("const DEFAULT_LOGIN_SCOPE = '000000'");
+    expect(loginVue).not.toContain("localStorage.removeItem('tenantId')");
+  });
+
   it('does not seed default admin credentials', () => {
     expect(loginVue).not.toContain("username: 'admin'");
     expect(loginVue).not.toContain("password: 'admin123'");
