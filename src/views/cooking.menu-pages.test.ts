@@ -148,4 +148,30 @@ describe('cooking dynamic menu pages', () => {
     expect(reviewTable).toContain('label="用户"');
     expect(reviewTable).toContain('label="厨师姓名"');
   });
+
+  it('matches settlement review and pay workflow requirements', () => {
+    const settlementPage = readPage('settlement');
+    const settlementTable = mainTable(settlementPage);
+    const settlementApi = readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'settlement', 'index.ts'), 'utf8');
+    const settlementTypes = readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'types.ts'), 'utf8');
+
+    expect(settlementPage).toContain('REVIEWING');
+    expect(settlementPage).toContain('label="操作"');
+    expect(settlementTable).toContain('handleView(row)');
+    expect(settlementTable).toContain('handleResolveReview(row)');
+    expect(settlementTable).toContain('handlePay(row)');
+    expect(settlementPage).toContain('处理复核');
+    expect(settlementPage).toContain('确认发放');
+    expect(settlementPage).toContain('reviewReason');
+    expect(settlementPage).toContain('reviewRemark');
+    expect(settlementPage).toContain('confirmTime');
+    expect(settlementPage).toContain('payTime');
+
+    expect(settlementApi).toContain('/cooking/settlement/review/resolve');
+    expect(settlementApi).toContain('/cooking/settlement/pay');
+    expect(settlementTypes).toContain('reviewReason?: string');
+    expect(settlementTypes).toContain('reviewRemark?: string');
+    expect(settlementTypes).toContain('confirmTime?: string');
+    expect(settlementTypes).toContain('payTime?: string');
+  });
 });

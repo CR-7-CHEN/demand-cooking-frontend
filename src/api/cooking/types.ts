@@ -85,8 +85,21 @@ export interface SettlementVO extends CookingBaseForm {
   settlementMonth?: string;
   orderCount?: number;
   orderAmount?: number;
+  baseSalary?: number;
+  violationCount?: number;
+  violationDeduction?: number;
   payableAmount?: number;
   status?: string;
+  reviewReason?: string;
+  reviewReasonType?: string;
+  reviewRemark?: string;
+  reviewAction?: string;
+  reviewResult?: string;
+  reviewReply?: string;
+  reviewApplyTime?: string;
+  reviewHandleTime?: string;
+  confirmTime?: string;
+  payTime?: string;
 }
 
 export interface ConfigVO extends CookingBaseForm {
