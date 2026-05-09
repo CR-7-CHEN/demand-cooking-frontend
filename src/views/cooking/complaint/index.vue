@@ -3,7 +3,7 @@
     <el-card shadow="hover" class="mb-[10px]">
       <el-form :model="queryParams" :inline="true">
         <el-form-item label="订单号"><el-input v-model="queryParams.orderNo" clearable @keyup.enter="getList" /></el-form-item>
-        <el-form-item label="状态"><el-select v-model="queryParams.status" clearable style="width: 150px"><el-option label="待处理" value="PENDING" /><el-option label="成立" value="VALID" /><el-option label="不成立" value="INVALID" /></el-select></el-form-item>
+        <el-form-item label="状态"><el-select v-model="queryParams.status" clearable style="width: 150px"><el-option label="待处理" value="PENDING" /><el-option label="成立" value="ESTABLISHED" /><el-option label="不成立" value="REJECTED" /></el-select></el-form-item>
         <el-form-item><el-button type="primary" icon="Search" @click="getList">搜索</el-button><el-button icon="Refresh" @click="resetQuery">重置</el-button></el-form-item>
       </el-form>
     </el-card>
@@ -36,8 +36,8 @@ import { handleComplaint, listComplaint } from '@/api/cooking/complaint';
 import type { ComplaintVO } from '@/api/cooking/complaint/types';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
-const complaintStatusMap: Record<string, string> = { PENDING: '待处理', VALID: '成立', INVALID: '不成立' };
-const complaintStatusType: Record<string, string> = { PENDING: 'warning', VALID: 'danger', INVALID: 'info' };
+const complaintStatusMap: Record<string, string> = { PENDING: '待处理', ESTABLISHED: '成立', REJECTED: '不成立' };
+const complaintStatusType: Record<string, string> = { PENDING: 'warning', ESTABLISHED: 'danger', REJECTED: 'info' };
 const loading = ref(false);
 const rows = ref<ComplaintVO[]>([]);
 const total = ref(0);
@@ -52,7 +52,7 @@ const getList = async () => {
 };
 const resetQuery = () => { Object.assign(queryParams, { pageNum: 1, orderNo: '', status: '' }); getList(); };
 const handle = async (row: ComplaintVO, established: boolean) => {
-  await handleComplaint({ ...row, established, status: established ? 'VALID' : 'INVALID' });
+  await handleComplaint({ ...row, established, status: established ? 'ESTABLISHED' : 'REJECTED' });
   proxy?.$modal.msgSuccess('投诉已处理');
   getList();
 };

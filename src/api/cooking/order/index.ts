@@ -8,6 +8,7 @@ export const submitOrder = (data: OrderForm): AxiosPromise<OrderVO> => request({
 export const quoteOrder = (data: OrderActionForm) => request({ url: '/cooking/order/quote', method: 'post', data });
 export const rejectOrder = (data: OrderActionForm) => request({ url: '/cooking/order/reject', method: 'post', data });
 export const paySuccessOrder = (data: OrderActionForm) => request({ url: '/cooking/order/pay/success', method: 'post', data });
+export const startServiceOrder = (data: OrderActionForm) => request({ url: '/cooking/order/serviceStart', method: 'post', data });
 export const serviceCompleteOrder = (data: OrderActionForm) => request({ url: '/cooking/order/serviceComplete', method: 'post', data });
 export const confirmOrder = (data: OrderActionForm) => request({ url: '/cooking/order/confirm', method: 'post', data });
 export const cancelOrder = (data: OrderActionForm) => request({ url: '/cooking/order/user/cancel', method: 'post', data });

@@ -25,6 +25,7 @@
           <template #default="{ row }">{{ userDisplay(row) }}</template>
         </el-table-column>
         <el-table-column label="上门时间" prop="serviceStartTime" min-width="170" />
+        <el-table-column label="开始服务时间" prop="serviceStartedTime" min-width="170" />
         <el-table-column label="状态" min-width="140">
           <template #default="{ row }"><el-tag>{{ statusText(row.status) }}</el-tag></template>
         </el-table-column>
@@ -49,6 +50,7 @@
         <el-descriptions-item label="做饭人员">{{ chefDisplay(current) }}</el-descriptions-item>
         <el-descriptions-item label="用户">{{ userDisplay(current) }}</el-descriptions-item>
         <el-descriptions-item label="上门时间">{{ current.serviceStartTime }}</el-descriptions-item>
+        <el-descriptions-item label="开始服务时间">{{ current.serviceStartedTime || '-' }}</el-descriptions-item>
         <el-descriptions-item label="服务区域">{{ current.serviceArea }}</el-descriptions-item>
         <el-descriptions-item label="联系人">{{ current.contactName }}</el-descriptions-item>
         <el-descriptions-item label="联系方式">{{ current.contactPhone }}</el-descriptions-item>
@@ -79,7 +81,7 @@ const statusOptions = [
   { label: '待支付', value: 'WAITING_PAY' },
   { label: '异议中', value: 'PRICE_OBJECTION' },
   { label: '待服务', value: 'WAITING_SERVICE' },
-  { label: '待确认', value: 'WAITING_CONFIRM' },
+  { label: '用户待确认', value: 'WAITING_CONFIRM' },
   { label: '已完成', value: 'COMPLETED' },
   { label: '退款中', value: 'REFUNDING' },
   { label: '已退款', value: 'REFUNDED' }

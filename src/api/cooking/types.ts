@@ -51,6 +51,8 @@ export interface OrderVO extends CookingBaseForm {
   contactPhone?: string;
   serviceArea?: string;
   serviceStartTime?: string;
+  serviceStartedFlag?: string;
+  serviceStartedTime?: string;
   status?: string;
   quoteAmount?: number;
   payAmount?: number;

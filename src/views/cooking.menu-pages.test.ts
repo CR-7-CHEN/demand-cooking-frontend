@@ -6,6 +6,7 @@ const cookingModules = ['address', 'area', 'message', 'review', 'faq', 'ticket']
 const adaptiveListModules = ['chef', 'order', 'dish', 'complaint', 'settlement', 'config', 'address', 'area', 'message', 'review', 'faq', 'ticket'];
 
 const readPage = (moduleName: string) => readFileSync(resolve(__dirname, 'cooking', moduleName, 'index.vue'), 'utf8');
+const readBackendInitSql = () => readFileSync(resolve(__dirname, '..', '..', '..', 'demand-cooking-backend', 'script', 'sql', 'demand_cooking.sql'), 'utf8');
 const firstBlock = (source: string, start: string, end: string) => {
   const startIndex = source.indexOf(start);
   expect(startIndex, `${start} exists`).toBeGreaterThanOrEqual(0);
@@ -54,6 +55,9 @@ describe('cooking dynamic menu pages', () => {
     const chefTable = mainTable(readPage('chef'));
     const orderTable = mainTable(readPage('order'));
     const dishPage = readPage('dish');
+    const orderPage = readPage('order');
+    const orderApi = readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'order', 'index.ts'), 'utf8');
+    const orderTypes = readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'types.ts'), 'utf8');
 
     expect(chefTable).toContain('label="服务区域"');
     expect(chefTable).toContain('handleServiceArea(row)');
@@ -101,6 +105,11 @@ describe('cooking dynamic menu pages', () => {
     expect(readPage('chef')).toContain("const isResignedStatus = (value?: string) => ['3', 'RESIGNED'].includes(String(value || ''))");
     expect(readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'types.ts'), 'utf8')).toContain('age?: number');
     expect(orderTable.indexOf('label="订单号"')).toBeLessThan(orderTable.indexOf('label="做饭人员"'));
+    expect(orderTable).toContain('prop="serviceStartedTime"');
+    expect(orderPage).toContain("label: '用户待确认'");
+    expect(orderApi).toContain("/cooking/order/serviceStart");
+    expect(orderTypes).toContain('serviceStartedTime?: string');
+    expect(orderTypes).toContain('serviceStartedFlag?: string');
     expect(dishPage).toContain('<ImageUpload v-model="form.imageUrl" :limit="1"');
     expect(dishPage).not.toContain('<el-input v-model="form.imageUrl"');
   });
@@ -173,5 +182,35 @@ describe('cooking dynamic menu pages', () => {
     expect(settlementTypes).toContain('reviewRemark?: string');
     expect(settlementTypes).toContain('confirmTime?: string');
     expect(settlementTypes).toContain('payTime?: string');
+  });
+
+  it('uses backend complaint status constants on the admin complaint page', () => {
+    const complaintPage = readPage('complaint');
+
+    expect(complaintPage).toContain('value="ESTABLISHED"');
+    expect(complaintPage).toContain('value="REJECTED"');
+    expect(complaintPage).toContain("ESTABLISHED: '成立'");
+    expect(complaintPage).toContain("REJECTED: '不成立'");
+    expect(complaintPage).toContain("status: established ? 'ESTABLISHED' : 'REJECTED'");
+    expect(complaintPage).not.toContain('value="VALID"');
+    expect(complaintPage).not.toContain('value="INVALID"');
+  });
+
+  it('keeps backend init sql aligned with cooking support admin pages', () => {
+    const initSql = readBackendInitSql();
+
+    expect(initSql).toContain('CREATE TABLE IF NOT EXISTS dc_cook_faq');
+    expect(initSql).toContain('CREATE TABLE IF NOT EXISTS dc_cook_support_ticket');
+    expect(initSql).toContain('INSERT INTO dc_cook_faq');
+    expect(initSql).toContain('cooking/faq/index');
+    expect(initSql).toContain('cooking/ticket/index');
+    expect(initSql).toContain('cooking:supportFaq:list');
+    expect(initSql).toContain('cooking:supportTicket:list');
+    expect(initSql).toContain('cooking:supportFaq:add');
+    expect(initSql).toContain('cooking:supportTicket:handle');
+    expect(initSql).toContain('ESTABLISHED');
+    expect(initSql).toContain('REJECTED');
+    expect(initSql).not.toContain('VALID成立');
+    expect(initSql).not.toContain('INVALID不成立');
   });
 });
