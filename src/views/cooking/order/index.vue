@@ -3,7 +3,7 @@
     <el-card shadow="hover" class="mb-[10px]">
       <el-form :model="queryParams" :inline="true">
         <el-form-item label="订单号"><el-input v-model="queryParams.orderNo" clearable @keyup.enter="getList" /></el-form-item>
-        <el-form-item label="做饭人员"><el-input v-model="queryParams.chefName" placeholder="做饭人员姓名" clearable @keyup.enter="getList" /></el-form-item>
+        <el-form-item label="服务厨师"><el-input v-model="queryParams.chefName" placeholder="服务厨师姓名" clearable @keyup.enter="getList" /></el-form-item>
         <el-form-item label="状态">
           <el-select v-model="queryParams.status" clearable style="width: 180px">
             <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -19,7 +19,7 @@
     <el-card shadow="hover">
       <el-table v-loading="loading" border :data="rows" style="width: 100%">
         <el-table-column label="订单号" prop="orderNo" min-width="150" />
-        <el-table-column label="做饭人员" min-width="130" show-overflow-tooltip>
+        <el-table-column label="服务厨师" min-width="130" show-overflow-tooltip>
           <template #default="{ row }">{{ chefDisplay(row) }}</template>
         </el-table-column>
         <el-table-column label="用户" min-width="120" show-overflow-tooltip>
@@ -53,7 +53,7 @@
         <el-descriptions :column="2" border>
           <el-descriptions-item label="订单号">{{ current.orderNo || '-' }}</el-descriptions-item>
           <el-descriptions-item label="创建时间">{{ current.createTime || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="做饭人员">{{ chefDisplay(current) }}</el-descriptions-item>
+          <el-descriptions-item label="服务厨师">{{ chefDisplay(current) }}</el-descriptions-item>
           <el-descriptions-item label="用户">{{ userDisplay(current) }}</el-descriptions-item>
         </el-descriptions>
       </div>
@@ -214,8 +214,8 @@ const cancelTypeText = (value?: string) => {
   const map: Record<string, string> = {
     USER_UNPAID: '用户取消（未支付）',
     USER_PAID: '用户取消（已支付）',
-    CHEF: '做饭人员取消',
-    CHEF_REJECT: '做饭人员拒单',
+    CHEF: '服务厨师取消',
+    CHEF_REJECT: '服务厨师拒单',
     SYSTEM_TIMEOUT: '系统超时关闭'
   };
   return map[value || ''] || value || '-';

@@ -4,7 +4,7 @@
       <el-form :model="queryParams" :inline="true">
         <el-form-item label="订单号"><el-input v-model="queryParams.orderNo" clearable placeholder="请输入订单号" @keyup.enter="getList" /></el-form-item>
         <el-form-item label="用户"><el-input v-model="queryParams.userKeyword" clearable placeholder="请输入用户" @keyup.enter="getList" /></el-form-item>
-        <el-form-item label="做饭人员"><el-input v-model="queryParams.chefName" clearable placeholder="请输入做饭人员" @keyup.enter="getList" /></el-form-item>
+        <el-form-item label="服务厨师"><el-input v-model="queryParams.chefName" clearable placeholder="请输入服务厨师" @keyup.enter="getList" /></el-form-item>
         <el-form-item label="状态"><el-select v-model="queryParams.status" clearable placeholder="请选择" style="width: 150px"><el-option label="待处理" value="PENDING" /><el-option label="成立" value="ESTABLISHED" /><el-option label="不成立" value="REJECTED" /></el-select></el-form-item>
         <el-form-item><el-button type="primary" icon="Search" @click="getList">搜索</el-button><el-button icon="Refresh" @click="resetQuery">重置</el-button></el-form-item>
       </el-form>
@@ -15,7 +15,7 @@
         <el-table-column label="用户" min-width="120" show-overflow-tooltip>
           <template #default="{ row }">{{ userDisplay(row) }}</template>
         </el-table-column>
-        <el-table-column label="做饭人员" min-width="130" show-overflow-tooltip>
+        <el-table-column label="服务厨师" min-width="130" show-overflow-tooltip>
           <template #default="{ row }">{{ chefDisplay(row) }}</template>
         </el-table-column>
         <el-table-column label="类型" min-width="120">

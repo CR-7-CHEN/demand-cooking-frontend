@@ -5,7 +5,7 @@
         <el-form-item label="月份">
           <el-date-picker v-model="queryParams.settlementMonth" value-format="YYYY-MM" type="month" />
         </el-form-item>
-        <el-form-item label="做饭人员">
+        <el-form-item label="服务厨师">
           <el-input v-model="queryParams.chefId" clearable @keyup.enter="getList" />
         </el-form-item>
         <el-form-item label="状态">
@@ -24,7 +24,7 @@
     <el-card shadow="hover">
       <el-table v-loading="loading" border :data="rows" style="width: 100%">
         <el-table-column label="月份" prop="settlementMonth" min-width="110" />
-        <el-table-column label="做饭人员" min-width="140" show-overflow-tooltip>
+        <el-table-column label="服务厨师" min-width="140" show-overflow-tooltip>
           <template #default="{ row }">{{ chefDisplay(row) }}</template>
         </el-table-column>
         <el-table-column label="完成单数" prop="orderCount" min-width="100" />
@@ -54,7 +54,7 @@
         <el-descriptions-item label="结算ID">{{ current.settlementId || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">{{ statusText(current.status) }}</el-descriptions-item>
         <el-descriptions-item label="月份">{{ current.settlementMonth || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="做饭人员">{{ chefDisplay(current) }}</el-descriptions-item>
+        <el-descriptions-item label="服务厨师">{{ chefDisplay(current) }}</el-descriptions-item>
         <el-descriptions-item label="完成单数">{{ displayValue(current.orderCount) }}</el-descriptions-item>
         <el-descriptions-item label="应发金额">{{ displayValue(current.payableAmount) }}</el-descriptions-item>
         <el-descriptions-item label="复核原因" :span="2">{{ reviewReasonText(current) }}</el-descriptions-item>
@@ -71,7 +71,7 @@
         <el-form-item label="结算月份">
           <span>{{ resolveDialog.settlementMonth || '-' }}</span>
         </el-form-item>
-        <el-form-item label="做饭人员">
+        <el-form-item label="服务厨师">
           <span>{{ resolveDialog.chefName || '-' }}</span>
         </el-form-item>
         <el-form-item label="处理方式" required>

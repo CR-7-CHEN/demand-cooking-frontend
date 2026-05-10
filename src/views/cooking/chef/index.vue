@@ -3,7 +3,7 @@
     <el-card shadow="hover" class="mb-[10px]">
       <el-form :model="queryParams" :inline="true">
         <el-form-item label="姓名">
-          <el-input v-model="queryParams.chefName" clearable placeholder="做饭人员姓名" @keyup.enter="getList" />
+          <el-input v-model="queryParams.chefName" clearable placeholder="服务厨师姓名" @keyup.enter="getList" />
         </el-form-item>
         <el-form-item label="手机号">
           <el-input v-model="queryParams.mobile" clearable placeholder="手机号" @keyup.enter="getList" />
@@ -197,14 +197,14 @@ const handleAdd = () => {
   Object.keys(form).forEach((key) => delete form[key]);
   form.gender = '2';
   form.chefStatus = '0';
-  dialog.title = '新增做饭人员';
+  dialog.title = '新增服务厨师';
   dialog.visible = true;
 };
 
 const handleEdit = (row: ChefVO) => {
   Object.assign(form, row);
   form.healthCertExpireDate = formatDate(row.healthCertExpireDate);
-  dialog.title = '编辑做饭人员';
+  dialog.title = '编辑服务厨师';
   dialog.visible = true;
 };
 
@@ -239,7 +239,7 @@ const handleStatus = async (row: ChefVO, chefStatus: string) => {
 const hasAvailableTime = (row: ChefVO) => buildAvailableTimeLines(row).length > 0;
 
 const handleAvailableTime = (row: ChefVO) => {
-  availableTimeDialog.title = `${row.chefName || '做饭人员'} - 可预约时间`;
+  availableTimeDialog.title = `${row.chefName || '服务厨师'} - 可预约时间`;
   availableTimeDialog.times = buildAvailableTimeLines(row);
   availableTimeDialog.visible = true;
 };
@@ -247,7 +247,7 @@ const handleAvailableTime = (row: ChefVO) => {
 const hasServiceArea = (row: any) => buildServiceAreaLines(row).length > 0;
 
 const handleServiceArea = (row: any) => {
-  serviceAreaDialog.title = `${row.chefName || '做饭人员'} - 服务区域`;
+  serviceAreaDialog.title = `${row.chefName || '服务厨师'} - 服务区域`;
   serviceAreaDialog.areas = buildServiceAreaLines(row);
   serviceAreaDialog.visible = true;
 };
