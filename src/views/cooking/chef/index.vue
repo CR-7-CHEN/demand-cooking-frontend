@@ -32,6 +32,7 @@
         </el-table-column>
         <el-table-column label="年龄" prop="age" min-width="90" />
         <el-table-column label="手机号" prop="mobile" min-width="130" />
+        <el-table-column label="底薪" prop="baseSalary" min-width="120" />
         <el-table-column label="服务区域" min-width="120">
           <template #default="{ row }">
             <el-button v-if="hasServiceArea(row)" link type="primary" @click="handleServiceArea(row)">查看</el-button>
@@ -61,7 +62,7 @@
           </template>
         </el-table-column>
         <el-table-column label="离职原因" prop="resignReason" min-width="180" show-overflow-tooltip />
-        <el-table-column label="操作" fixed="right" width="210">
+        <el-table-column label="操作" fixed="right" width="210" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
             <el-button link type="success" @click="handleAudit(row, '1')">通过</el-button>

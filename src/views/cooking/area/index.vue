@@ -39,7 +39,7 @@
         <el-table-column label="排序" prop="sort" min-width="90" />
         <el-table-column label="备注" prop="remark" min-width="180" show-overflow-tooltip />
         <el-table-column label="创建时间" prop="createTime" min-width="170" />
-        <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right" width="150" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
             <el-button link type="danger" icon="Delete" @click="handleDelete(row)">删除</el-button>

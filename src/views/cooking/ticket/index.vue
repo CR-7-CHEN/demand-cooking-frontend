@@ -51,7 +51,7 @@
         <el-table-column label="提交时间" min-width="170">
           <template #default="{ row }">{{ row.submitTime || row.createTime || '-' }}</template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="240">
+        <el-table-column label="操作" fixed="right" width="240" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="View" @click="showDetail(row)">详情</el-button>
             <el-button link type="success" icon="Edit" :disabled="row.status === 'CLOSED'" @click="handleReply(row)">处理</el-button>

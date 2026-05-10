@@ -12,7 +12,17 @@
           <el-input v-model="queryParams.userKeyword" clearable placeholder="用户" @keyup.enter="getList" />
         </el-form-item>
         <el-form-item label="所在区域">
-          <el-input v-model="queryParams.areaName" clearable placeholder="省市区/服务区域" @keyup.enter="getList" />
+          <el-cascader
+            v-model="queryAreaCodes"
+            clearable
+            filterable
+            :options="regionOptions"
+            :props="regionCascaderProps"
+            placeholder="请选择省 / 市 / 区"
+            style="width: 220px"
+            @change="handleQueryAreaChange"
+            @clear="handleQueryAreaClear"
+          />
         </el-form-item>
         <el-form-item label="创建时间" style="width: 308px">
           <el-date-picker
@@ -45,14 +55,14 @@
         <el-table-column label="门牌号" prop="houseNumber" min-width="120" show-overflow-tooltip />
         <el-table-column label="默认地址" prop="defaultFlag" min-width="100">
           <template #default="{ row }">
-            <el-tag :type="row.defaultFlag === 'Y' ? 'success' : 'info'">{{ defaultFlagText(row.defaultFlag) }}</el-tag>
+            <el-tag :type="isDefaultAddress(row.defaultFlag) ? 'success' : 'info'">{{ defaultFlagText(row.defaultFlag) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="状态/类型" prop="snapshotType" min-width="120">
           <template #default="{ row }">{{ snapshotTypeText(row.snapshotType) }}</template>
         </el-table-column>
         <el-table-column label="创建时间" prop="createTime" min-width="170" />
-        <el-table-column label="操作" fixed="right" width="210">
+        <el-table-column label="操作" fixed="right" width="210" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="View" @click="handleView(row)">查看</el-button>
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
@@ -84,12 +94,11 @@
           <el-col :span="12">
             <el-form-item label="默认地址">
               <el-radio-group v-model="form.defaultFlag">
-                <el-radio value="Y">是</el-radio>
-                <el-radio value="N">否</el-radio>
+                <el-radio v-for="item in defaultFlagOptions" :key="item.value" :value="item.value">{{ item.label }}</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col v-if="isView" :span="12">
             <el-form-item label="区域编码">
               <el-input v-model="form.areaCode" placeholder="区域编码" />
             </el-form-item>
@@ -111,27 +120,9 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="状态/类型">
-              <el-input v-model="form.snapshotType" placeholder="常用地址可留空" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="经度">
-              <el-input v-model="form.longitude" placeholder="经度" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="纬度">
-              <el-input v-model="form.latitude" placeholder="纬度" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="来源地址">
-              <el-input v-model="form.sourceAddressId" placeholder="来源地址ID" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="快照时间">
-              <el-date-picker v-model="form.snapshotTime" value-format="YYYY-MM-DD HH:mm:ss" type="datetime" placeholder="快照时间" class="w-full" />
+              <el-select v-model="form.snapshotType" clearable placeholder="常用地址" class="w-full">
+                <el-option v-for="item in snapshotTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -152,20 +143,49 @@
 <script setup name="CookingAddress" lang="ts">
 import { addAddress, delAddress, getAddress, listAddress, updateAddress } from '@/api/cooking/address';
 import type { AddressVO } from '@/api/cooking/address/types';
+import regionData from '@/utils/china-region-data';
+import type { ChinaRegionOption } from '@/utils/china-region-data';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+type RegionValue = string | number;
+type RegionOption = ChinaRegionOption;
+
 const loading = ref(false);
 const rows = ref<AddressVO[]>([]);
 const total = ref(0);
 const dateRange = ref<string[]>([]);
 const queryParams = reactive<any>({ pageNum: 1, pageSize: 10, contactName: '', contactPhone: '', userKeyword: '', areaName: '' });
+const queryAreaCodes = ref<RegionValue[]>([]);
+const regionOptions = regionData;
+const regionCascaderProps = { value: 'value', label: 'label', children: 'children', emitPath: true } as const;
 const form = reactive<any>({});
 const dialog = reactive({ visible: false, title: '', mode: 'edit' });
 const isView = computed(() => dialog.mode === 'view');
+const defaultFlagOptions = [
+  { label: '是', value: '1' },
+  { label: '否', value: '0' }
+];
+const snapshotTypeOptions = [
+  { label: '常用地址', value: 'NORMAL' },
+  { label: '订单快照', value: 'ORDER' },
+  { label: '预约快照', value: 'RESERVE' },
+  { label: '用户地址', value: 'USER' }
+];
 
-const defaultFlagText = (value?: string) => ({ Y: '是', N: '否', '1': '是', '0': '否' })[value || ''] || value || '否';
-const snapshotTypeText = (value?: string) => ({ USER: '常用地址', ORDER: '订单快照', RESERVE: '预约快照' })[value || ''] || value || '常用地址';
+const isDefaultAddress = (value?: string) => ['Y', '1', 'true'].includes(String(value || ''));
+const defaultFlagText = (value?: string) => (isDefaultAddress(value) ? '是' : '否');
+const snapshotTypeText = (value?: string) => snapshotTypeOptions.find((item) => item.value === value)?.label || value || '常用地址';
 const userDisplay = (row: AddressVO) => row.userName || row.nickName || row.userId || '-';
+
+const handleQueryAreaChange = (value?: RegionValue[] | RegionValue) => {
+  const selectedPath = getSelectedRegionPath(Array.isArray(value) ? value : value ? [value] : []);
+  queryParams.areaName = selectedPath.map((item) => item.label).join(' ');
+};
+
+const handleQueryAreaClear = () => {
+  queryAreaCodes.value = [];
+  queryParams.areaName = '';
+};
 
 const getList = async () => {
   loading.value = true;
@@ -180,7 +200,7 @@ const getList = async () => {
 
 const resetForm = () => {
   Object.keys(form).forEach((key) => delete form[key]);
-  form.defaultFlag = 'N';
+  form.defaultFlag = '0';
 };
 
 const handleQuery = () => {
@@ -190,6 +210,7 @@ const handleQuery = () => {
 
 const resetQuery = () => {
   Object.assign(queryParams, { pageNum: 1, contactName: '', contactPhone: '', userKeyword: '', areaName: '' });
+  queryAreaCodes.value = [];
   dateRange.value = [];
   getList();
 };
@@ -231,5 +252,19 @@ const handleDelete = async (row: AddressVO) => {
   getList();
 };
 
-onMounted(getList);
+const getSelectedRegionPath = (values: RegionValue[]) => {
+  const path: RegionOption[] = [];
+  let options: RegionOption[] = regionOptions;
+  for (const value of values) {
+    const current = options.find((item) => String(item.value) === String(value));
+    if (!current) break;
+    path.push(current);
+    options = current.children || [];
+  }
+  return path;
+};
+
+onMounted(() => {
+  getList();
+});
 </script>

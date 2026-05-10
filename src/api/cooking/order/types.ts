@@ -1,4 +1,10 @@
-export type { CookingBaseQuery as OrderQuery, OrderVO, OrderVO as OrderForm } from '../types';
+import type { CookingBaseQuery, OrderVO } from '../types';
+
+export type { OrderVO, OrderVO as OrderForm };
+
+export interface OrderQuery extends CookingBaseQuery {
+  chefName?: string;
+}
 
 export interface OrderActionForm {
   orderId?: string | number;

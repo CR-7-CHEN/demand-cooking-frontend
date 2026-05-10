@@ -6,6 +6,10 @@ export interface MessageVO extends CookingBaseForm {
   channel?: string;
   receiverType?: string;
   receiverId?: string | number;
+  receiverName?: string;
+  userName?: string;
+  nickName?: string;
+  chefName?: string;
   receiverMobileMask?: string;
   receiverOpenidMask?: string;
   relatedOrderId?: string | number;

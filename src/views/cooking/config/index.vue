@@ -24,7 +24,7 @@
           </template>
         </el-table-column>
         <el-table-column label="生效时间" prop="effectiveTime" min-width="170" />
-        <el-table-column label="操作" fixed="right" width="160">
+        <el-table-column label="操作" fixed="right" width="160" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
             <el-button link type="success" @click="publish(row)">发布</el-button>

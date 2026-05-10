@@ -79,6 +79,23 @@ import { computed, onMounted, ref } from 'vue';
 type DisplayPendingItem = Required<Pick<DashboardPendingItem, 'key' | 'label' | 'count' | 'tone'>>;
 type DisplayRecentOrder = DashboardRecentOrder & { tone: string };
 
+const recentOrderStatusTextMap: Record<string, string> = {
+  WAITING_RESPONSE: '待响应',
+  REJECTED_CLOSED: '已拒单',
+  RESPONSE_TIMEOUT_CLOSED: '响应超时关闭',
+  WAITING_PAY: '待支付',
+  PRICE_OBJECTION: '异议中',
+  OBJECTION_TIMEOUT_CLOSED: '异议超时关闭',
+  PAY_TIMEOUT_CLOSED: '支付超时关闭',
+  WAITING_SERVICE: '待服务',
+  WAITING_CONFIRM: '待确认',
+  COMPLETED: '已完成',
+  CANCELED: '已取消',
+  REFUNDING: '退款中',
+  REFUNDED: '已退款',
+  REFUND_FAILED: '退款失败'
+};
+
 const defaultOverview: DashboardOverviewVO = {
   todayOrders: 0,
   todayRevenue: 0,
@@ -170,7 +187,7 @@ const recentOrders = computed<DisplayRecentOrder[]>(() => {
   return orders.map((order) => ({
     ...order,
     orderNo: order.orderNo || '-',
-    statusLabel: order.statusLabel || order.status || '-',
+    statusLabel: recentOrderStatusText(order),
     tone: orderTone(order.status)
   }));
 });
@@ -265,6 +282,21 @@ const formatTrendAmount = (value: number | string | undefined | null) => {
     return `¥${(amount / 1000).toFixed(1).replace(/\.0$/, '')}k`;
   }
   return formatCurrency(amount);
+};
+
+const recentOrderStatusText = (order: DashboardRecentOrder) => {
+  const statusCandidates = [order.status, order.statusLabel]
+    .map((item) => item?.trim())
+    .filter((item): item is string => Boolean(item));
+
+  for (const candidate of statusCandidates) {
+    const mapped = recentOrderStatusTextMap[candidate.toUpperCase()];
+    if (mapped) {
+      return mapped;
+    }
+  }
+
+  return order.statusLabel || order.status || '-';
 };
 
 const orderTone = (status?: string) => {

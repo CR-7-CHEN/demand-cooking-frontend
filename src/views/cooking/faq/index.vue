@@ -37,7 +37,7 @@
         <el-table-column label="排序" prop="sort" min-width="90" />
         <el-table-column label="命中次数" prop="hitCount" min-width="100" />
         <el-table-column label="更新时间" prop="updateTime" min-width="170" />
-        <el-table-column label="操作" fixed="right" width="250">
+        <el-table-column label="操作" fixed="right" width="250" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
             <el-button link :type="row.status === '0' ? 'warning' : 'success'" icon="Switch" @click="handleStatus(row)">

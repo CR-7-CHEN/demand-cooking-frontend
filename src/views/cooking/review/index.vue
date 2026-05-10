@@ -62,11 +62,12 @@
         <el-table-column label="评价时间" prop="reviewTime" min-width="170">
           <template #default="{ row }">{{ formatTime(row.reviewTime || row.createTime) }}</template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="170">
+        <el-table-column label="操作" fixed="right" width="170" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="View" @click="showDetail(row)">详情</el-button>
-            <el-button v-if="!isHidden(row)" link type="warning" icon="Hide" @click="handleHide(row)">隐藏</el-button>
-            <el-button v-else link type="info" disabled>已隐藏</el-button>
+            <el-button link :type="hideActionType(row)" :icon="hideActionIcon(row)" @click="toggleDisplayStatus(row)">{{
+              hideActionText(row)
+            }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -154,11 +155,12 @@ const showDetail = async (row: ReviewVO) => {
   detail.visible = true;
 };
 
-const handleHide = async (row: ReviewVO) => {
+const toggleDisplayStatus = async (row: ReviewVO) => {
   if (!row.reviewId) return;
-  await proxy?.$modal.confirm(`是否确认隐藏订单"${row.orderNo || row.orderId || '-'}"的评价？`);
+  const actionText = isHidden(row) ? '取消隐藏' : '隐藏';
+  await proxy?.$modal.confirm(`是否确认${actionText}订单"${row.orderNo || row.orderId || '-'}"的评价？`);
   await hideReview(row.reviewId);
-  proxy?.$modal.msgSuccess('评价已隐藏');
+  proxy?.$modal.msgSuccess(`评价已${actionText}`);
   getList();
 };
 
@@ -170,13 +172,17 @@ const imageList = computed(() =>
 );
 
 const isHidden = (row: ReviewVO) => String(row.displayStatus || '').toUpperCase() === 'HIDE';
+const hideActionText = (row: ReviewVO) => (isHidden(row) ? '取消隐藏' : '隐藏');
+const hideActionType = (row: ReviewVO) => (isHidden(row) ? 'info' : 'warning');
+const hideActionIcon = (row: ReviewVO) => (isHidden(row) ? 'View' : 'Hide');
 
 const displayStatusText = (value?: string) => displayStatusOptions.find((item) => item.value === value)?.label || value || '-';
 
 const displayStatusTag = (value?: string): DisplayStatusTagType => displayStatusOptions.find((item) => item.value === value)?.type || 'info';
 
 const adjustedText = (value?: string) => ({ Y: '是', N: '否' })[String(value || '').toUpperCase()] || value || '-';
-const displayRating = (value?: number | string) => (value === 0 || value === '0' ? value : (value !== undefined && value !== null && value !== '' ? value : '-'));
+const displayRating = (value?: number | string) =>
+  value === 0 || value === '0' ? value : value !== undefined && value !== null && value !== '' ? value : '-';
 
 const formatTime = (value?: string) => proxy?.parseTime(value) || '-';
 const userDisplay = (row: ReviewVO) => row.userName || row.nickName || row.userId || '-';

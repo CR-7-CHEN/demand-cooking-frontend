@@ -74,6 +74,8 @@ export interface ComplaintVO extends CookingBaseForm {
   orderId?: string | number;
   orderNo?: string;
   userId?: string | number;
+  userName?: string;
+  nickName?: string;
   chefId?: string | number;
   chefName?: string;
   complaintType?: string;

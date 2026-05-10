@@ -38,7 +38,7 @@
             <el-tag :type="statusTag(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="260">
+        <el-table-column label="操作" fixed="right" width="260" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="View" @click="handleView(row)">详情</el-button>
             <el-button v-if="isReviewing(row)" link type="warning" @click="handleResolveReview(row)">处理复核</el-button>

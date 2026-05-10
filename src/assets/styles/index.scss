@@ -180,6 +180,19 @@ aside {
   text-align: center;
 }
 
+.table-action-cell {
+  .cell {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .el-button {
+    flex-shrink: 0;
+  }
+}
+
 .sub-navbar {
   height: 50px;
   line-height: 50px;

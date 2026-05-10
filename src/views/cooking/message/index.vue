@@ -54,36 +54,26 @@
         </el-table-column>
         <el-table-column label="消息类型" prop="messageType" min-width="130">
           <template #default="{ row }">
-            <el-tag>{{ optionText(messageTypeOptions, row.messageType) }}</el-tag>
+            <el-tag>{{ messageTypeText(row.messageType) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="接收人" min-width="150">
-          <template #default="{ row }">
-            {{ optionText(receiverTypeOptions, row.receiverType) }}
-            <span v-if="row.receiverId"> / {{ row.receiverId }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="业务" min-width="190">
-          <template #default="{ row }">
-            <span>{{ optionText(bizTypeOptions, row.relatedBizType) || '-' }}</span>
-            <span v-if="row.relatedBizId"> / {{ row.relatedBizId }}</span>
-            <span v-if="row.relatedOrderNo"> / {{ row.relatedOrderNo }}</span>
-          </template>
+          <template #default="{ row }">{{ receiverDisplay(row) }}</template>
         </el-table-column>
         <el-table-column label="渠道" prop="channel" min-width="110">
           <template #default="{ row }">
-            <el-tag type="info">{{ optionText(channelOptions, row.channel) }}</el-tag>
+            <el-tag type="info">{{ channelText(row.channel) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="发送状态" prop="sendStatus" min-width="120">
           <template #default="{ row }">
-            <el-tag :type="sendStatusTagType(row.sendStatus)">{{ optionText(sendStatusOptions, row.sendStatus) }}</el-tag>
+            <el-tag :type="sendStatusTagType(row.sendStatus)">{{ sendStatusText(row.sendStatus) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="内容摘要" prop="contentSummary" min-width="260" show-overflow-tooltip />
         <el-table-column label="失败原因" prop="failReason" min-width="180" show-overflow-tooltip />
         <el-table-column label="发送时间" prop="sendTime" min-width="170" />
-        <el-table-column label="操作" fixed="right" width="200">
+        <el-table-column label="操作" fixed="right" width="200" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="View" @click="showDetail(row)">详情</el-button>
             <el-button link type="info" icon="Edit" @click="handleEdit(row)">编辑</el-button>
@@ -98,10 +88,10 @@
       <el-descriptions v-loading="detailLoading" :column="2" border>
         <el-descriptions-item label="消息ID">{{ current.messageId }}</el-descriptions-item>
         <el-descriptions-item label="发送状态">
-          <el-tag :type="sendStatusTagType(current.sendStatus)">{{ optionText(sendStatusOptions, current.sendStatus) }}</el-tag>
+          <el-tag :type="sendStatusTagType(current.sendStatus)">{{ sendStatusText(current.sendStatus) }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="消息类型">{{ optionText(messageTypeOptions, current.messageType) }}</el-descriptions-item>
-        <el-descriptions-item label="渠道">{{ optionText(channelOptions, current.channel) }}</el-descriptions-item>
+        <el-descriptions-item label="消息类型">{{ messageTypeText(current.messageType) }}</el-descriptions-item>
+        <el-descriptions-item label="渠道">{{ channelText(current.channel) }}</el-descriptions-item>
         <el-descriptions-item label="接收类型">{{ optionText(receiverTypeOptions, current.receiverType) }}</el-descriptions-item>
         <el-descriptions-item label="接收人ID">{{ current.receiverId || '-' }}</el-descriptions-item>
         <el-descriptions-item label="手机号掩码">{{ current.receiverMobileMask || '-' }}</el-descriptions-item>
@@ -192,8 +182,21 @@ import type { MessageForm, MessageQuery, MessageVO } from '@/api/cooking/message
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
 const messageTypeOptions = [
-  { label: '订单通知', value: 'ORDER' },
-  { label: '退款通知', value: 'REFUND' },
+  { label: '订单提交', value: 'ORDER_SUBMIT' },
+  { label: '订单报价', value: 'ORDER_QUOTE' },
+  { label: '订单拒单', value: 'ORDER_REJECT' },
+  { label: '报价异议', value: 'ORDER_OBJECTION' },
+  { label: '支付成功', value: 'PAY_SUCCESS' },
+  { label: '开始服务', value: 'SERVICE_START' },
+  { label: '服务完成', value: 'SERVICE_COMPLETE' },
+  { label: '用户确认完成', value: 'ORDER_CONFIRM' },
+  { label: '用户申请退款', value: 'ORDER_REFUND' },
+  { label: '厨师取消退款', value: 'CHEF_CANCEL_REFUND' },
+  { label: '响应超时关闭', value: 'ORDER_RESPONSE_TIMEOUT' },
+  { label: '支付超时关闭', value: 'ORDER_PAY_TIMEOUT' },
+  { label: '异议超时关闭', value: 'ORDER_OBJECTION_TIMEOUT' },
+  { label: '系统自动完成服务', value: 'SERVICE_AUTO_COMPLETE' },
+  { label: '系统自动确认完成', value: 'ORDER_AUTO_CONFIRM' },
   { label: '结算通知', value: 'SETTLEMENT' },
   { label: '投诉通知', value: 'COMPLAINT' },
   { label: '系统通知', value: 'SYSTEM' },
@@ -205,14 +208,12 @@ const receiverTypeOptions = [
   { label: '管理员', value: 'ADMIN' }
 ];
 const channelOptions = [
-  { label: '站内', value: 'SYSTEM' },
-  { label: '短信', value: 'SMS' },
+  { label: '站内信', value: 'IN_APP' },
   { label: '微信', value: 'WECHAT' },
-  { label: 'App', value: 'APP' }
+  { label: '短信', value: 'SMS' }
 ];
 const sendStatusOptions = [
   { label: '待发送', value: 'PENDING' },
-  { label: '发送中', value: 'SENDING' },
   { label: '已发送', value: 'SENT' },
   { label: '发送失败', value: 'FAILED' }
 ];
@@ -225,7 +226,32 @@ const bizTypeOptions = [
   { label: '配置', value: 'CONFIG' }
 ];
 type TagType = 'primary' | 'success' | 'info' | 'warning' | 'danger';
-const sendStatusType: Record<string, TagType> = { PENDING: 'info', SENDING: 'warning', SENT: 'success', FAILED: 'danger' };
+const messageTypeTextMap: Record<string, string> = Object.fromEntries(messageTypeOptions.map((item) => [item.value, item.label]));
+Object.assign(messageTypeTextMap, {
+  ORDER: '订单通知',
+  REFUND: '退款通知'
+});
+const channelTextMap: Record<string, string> = {
+  IN_APP: '站内信',
+  SYSTEM: '站内信',
+  WECHAT: '微信',
+  SMS: '短信',
+  APP: 'App'
+};
+const sendStatusTextMap: Record<string, string> = {
+  PENDING: '待发送',
+  SENDING: '发送中',
+  SENT: '已发送',
+  SUCCESS: '已发送',
+  FAILED: '发送失败'
+};
+const sendStatusType: Record<string, TagType> = {
+  PENDING: 'info',
+  SENDING: 'warning',
+  SENT: 'success',
+  SUCCESS: 'success',
+  FAILED: 'danger'
+};
 
 const loading = ref(false);
 const detailLoading = ref(false);
@@ -247,8 +273,18 @@ const formDialog = reactive({ visible: false, title: '' });
 const current = reactive<MessageVO>({});
 const form = reactive<MessageForm>({});
 
-const optionText = (options: Array<{ label: string; value: string }>, value?: string) => options.find((item) => item.value === value)?.label || value || '-';
-const sendStatusTagType = (value?: string): TagType => sendStatusType[value || ''] || 'info';
+const optionText = (options: Array<{ label: string; value: string }>, value?: string) =>
+  options.find((item) => item.value === value)?.label || value || '-';
+const enumText = (textMap: Record<string, string>, value?: string) => textMap[String(value || '').toUpperCase()] || value || '-';
+const messageTypeText = (value?: string) => enumText(messageTypeTextMap, value);
+const channelText = (value?: string) => enumText(channelTextMap, value);
+const sendStatusText = (value?: string) => enumText(sendStatusTextMap, value);
+const sendStatusTagType = (value?: string): TagType => sendStatusType[String(value || '').toUpperCase()] || 'info';
+const receiverDisplay = (row: MessageVO) => {
+  const receiverType = optionText(receiverTypeOptions, row.receiverType);
+  const receiverName = row.receiverName || row.userName || row.nickName || row.chefName;
+  return receiverName ? `${receiverType}/${receiverName}` : receiverType;
+};
 
 const buildQueryParams = (): MessageQuery => {
   const query: MessageQuery = { ...queryParams };
@@ -289,7 +325,7 @@ const resetRecord = () => {
 
 const resetForm = () => {
   Object.keys(form).forEach((key) => delete (form as Record<string, any>)[key]);
-  Object.assign(form, { messageType: '', channel: '', receiverType: '', sendStatus: 'SENT' });
+  Object.assign(form, { messageType: '', channel: 'IN_APP', receiverType: '', sendStatus: 'SENT' });
 };
 
 const showDetail = async (row: MessageVO) => {

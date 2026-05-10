@@ -7,6 +7,7 @@ const source = readFileSync(resolve(__dirname, 'cooking', 'review', 'index.vue')
 describe('cooking review rating display', () => {
   it('keeps zero rating values visible in the detail panel', () => {
     expect(source).toContain('displayRating(current.rating)');
-    expect(source).toContain("const displayRating = (value?: number | string) => (value === 0 || value === '0' ? value : (value !== undefined && value !== null && value !== '' ? value : '-'));");
+    expect(source).toContain("value === 0 || value === '0'");
+    expect(source).toContain("value !== undefined && value !== null && value !== '' ? value : '-'");
   });
 });

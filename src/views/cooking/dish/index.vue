@@ -19,7 +19,7 @@
         <el-table-column label="状态" min-width="100"><template #default="{ row }"><el-tag>{{ row.status === '0' ? '启用' : '停用' }}</el-tag></template></el-table-column>
         <el-table-column label="排序" prop="sort" min-width="90" />
         <el-table-column label="说明" prop="description" min-width="220" show-overflow-tooltip />
-        <el-table-column label="操作" fixed="right" width="150">
+        <el-table-column label="操作" fixed="right" width="150" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
             <el-button link type="danger" icon="Delete" @click="handleDelete(row)">删除</el-button>
