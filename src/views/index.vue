@@ -46,7 +46,13 @@
             <h2>待处理事项</h2>
           </div>
           <div class="pending-list">
-            <div v-for="item in pendingItems" :key="item.key" class="pending-item">
+            <div
+              v-for="item in pendingItems"
+              :key="item.key"
+              class="pending-item"
+              :class="{ clickable: isPendingItemClickable(item) }"
+              @click="handlePendingItemClick(item)"
+            >
               <span class="pending-item__dot" :class="item.tone"></span>
               <span class="pending-item__label">{{ item.label }}</span>
               <strong>{{ formatCount(item.count) }}</strong>
@@ -75,6 +81,7 @@
 import { getDashboardOverview } from '@/api/cooking/dashboard';
 import type { DashboardOverviewVO, DashboardPendingItem, DashboardRecentOrder } from '@/api/cooking/dashboard/types';
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 type DisplayPendingItem = Required<Pick<DashboardPendingItem, 'key' | 'label' | 'count' | 'tone'>>;
 type DisplayRecentOrder = DashboardRecentOrder & { tone: string };
@@ -111,14 +118,20 @@ const defaultOverview: DashboardOverviewVO = {
 
 const defaultPendingItems: DisplayPendingItem[] = [
   { key: 'chefAudit', label: '厨师审核待处理', count: 0, tone: 'danger' },
-  { key: 'complaintReply', label: '用户投诉待回复', count: 0, tone: 'warning' },
+  { key: 'complaintReply', label: '用户投诉待处理', count: 0, tone: 'warning' },
   { key: 'chefService', label: '厨师待服务', count: 0, tone: 'success' }
 ];
 
 const dashboard = ref<DashboardOverviewVO>({ ...defaultOverview });
 const trendMode = ref('week');
 const loading = ref(false);
+const router = useRouter();
 let requestSeq = 0;
+
+const pendingItemRoutes: Record<string, { path: string; query: Record<string, string> }> = {
+  chefAudit: { path: '/cooking/chef', query: { auditStatus: '0' } },
+  complaintReply: { path: '/cooking/complaint', query: { status: 'PENDING' } }
+};
 
 const todayText = computed(() => {
   const now = new Date();
@@ -181,6 +194,15 @@ const pendingItems = computed<DisplayPendingItem[]>(() => {
 
   return [...baseItems, ...extraItems];
 });
+
+const isPendingItemClickable = (item: DisplayPendingItem) => Boolean(pendingItemRoutes[item.key]);
+
+const handlePendingItemClick = (item: DisplayPendingItem) => {
+  const target = pendingItemRoutes[item.key];
+  if (target) {
+    router.push(target);
+  }
+};
 
 const recentOrders = computed<DisplayRecentOrder[]>(() => {
   const orders = Array.isArray(dashboard.value.recentOrders) ? dashboard.value.recentOrders : [];
@@ -531,6 +553,19 @@ onMounted(loadDashboard);
 
   &:last-child {
     border-bottom: 0;
+  }
+}
+
+.pending-item.clickable {
+  cursor: pointer;
+  border-radius: 6px;
+  transition:
+    background-color 0.16s ease,
+    transform 0.16s ease;
+
+  &:hover {
+    background: #fff5ed;
+    transform: translateX(2px);
   }
 }
 

@@ -30,6 +30,7 @@
         <el-table-column label="完成单数" prop="orderCount" min-width="100" />
         <el-table-column label="订单金额" prop="orderAmount" min-width="120" />
         <el-table-column label="个人底薪" prop="baseSalary" min-width="120" />
+        <el-table-column label="提成总计" prop="chefCommission" min-width="120" />
         <el-table-column label="违约次数" prop="violationCount" min-width="100" />
         <el-table-column label="违约扣款" prop="violationDeduction" min-width="120" />
         <el-table-column label="应发金额" prop="payableAmount" min-width="120" />
@@ -117,10 +118,14 @@ const resolveActionOptions = [
 const loading = ref(false);
 const rows = ref<SettlementVO[]>([]);
 const total = ref(0);
+const currentSettlementMonth = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+};
 const queryParams = reactive<SettlementQuery>({
   pageNum: 1,
   pageSize: 10,
-  settlementMonth: '',
+  settlementMonth: currentSettlementMonth(),
   chefId: '',
   status: ''
 });
@@ -149,7 +154,7 @@ const getList = async () => {
 };
 
 const resetQuery = () => {
-  Object.assign(queryParams, { pageNum: 1, settlementMonth: '', chefId: '', status: '' });
+  Object.assign(queryParams, { pageNum: 1, settlementMonth: currentSettlementMonth(), chefId: '', status: '' });
   getList();
 };
 

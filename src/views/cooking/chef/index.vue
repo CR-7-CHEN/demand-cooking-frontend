@@ -16,6 +16,13 @@
             <el-option label="离职" value="3" />
           </el-select>
         </el-form-item>
+        <el-form-item label="审核状态">
+          <el-select v-model="queryParams.auditStatus" clearable placeholder="审核状态" style="width: 150px">
+            <el-option label="待审核" value="0" />
+            <el-option label="通过" value="1" />
+            <el-option label="驳回" value="2" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="Search" @click="getList">搜索</el-button>
           <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -61,11 +68,13 @@
             <el-tag :type="row.chefStatus === '0' ? 'success' : 'info'">{{ statusText(row.chefStatus) }}</el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="驳回原因" prop="auditReason" min-width="180" show-overflow-tooltip />
         <el-table-column label="离职原因" prop="resignReason" min-width="180" show-overflow-tooltip />
-        <el-table-column label="操作" fixed="right" width="210" class-name="table-action-cell">
+        <el-table-column label="操作" fixed="right" width="250" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
             <el-button link type="success" @click="handleAudit(row, '1')">通过</el-button>
+            <el-button link type="danger" @click="handleRejectAudit(row)">驳回</el-button>
             <el-button link type="warning" @click="handleStatus(row, '1')">暂停</el-button>
           </template>
         </el-table-column>
@@ -161,22 +170,59 @@
       </div>
       <el-empty v-else description="暂无服务区域" />
     </el-dialog>
+
+    <el-dialog v-model="rejectAuditDialog.visible" title="驳回入驻申请" width="520px" append-to-body>
+      <el-form :model="rejectAuditForm" label-width="90px">
+        <el-form-item label="服务厨师">
+          <span>{{ rejectAuditForm.chefName || '-' }}</span>
+        </el-form-item>
+        <el-form-item label="驳回原因" required>
+          <el-input
+            v-model="rejectAuditForm.auditReason"
+            type="textarea"
+            :rows="4"
+            maxlength="500"
+            show-word-limit
+            placeholder="请填写驳回原因"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="rejectAuditDialog.visible = false">取消</el-button>
+        <el-button type="danger" @click="submitRejectAudit">确认驳回</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="CookingChef" lang="ts">
 import { addChef, auditChef, changeChefStatus, listChef, updateChef } from '@/api/cooking/chef';
 import type { ChefVO } from '@/api/cooking/chef/types';
+import { useRoute } from 'vue-router';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+const route = useRoute();
 const loading = ref(false);
 const rows = ref<ChefVO[]>([]);
 const total = ref(0);
-const queryParams = reactive<any>({ pageNum: 1, pageSize: 10, chefName: '', mobile: '', chefStatus: '' });
+const routeQueryValue = (value: unknown) => {
+  const firstValue = Array.isArray(value) ? value[0] : value;
+  return typeof firstValue === 'string' ? firstValue : '';
+};
+const queryParams = reactive<any>({
+  pageNum: 1,
+  pageSize: 10,
+  chefName: '',
+  mobile: '',
+  chefStatus: '',
+  auditStatus: routeQueryValue(route.query.auditStatus)
+});
 const form = reactive<any>({});
 const dialog = reactive({ visible: false, title: '' });
 const availableTimeDialog = reactive({ visible: false, title: '可预约时间', times: [] as string[] });
 const serviceAreaDialog = reactive({ visible: false, title: '服务区域', areas: [] as string[] });
+const rejectAuditDialog = reactive({ visible: false });
+const rejectAuditForm = reactive<any>({ chefId: undefined, chefName: '', auditReason: '' });
 const isEditMode = computed(() => Boolean(form.chefId));
 const canEditResignReason = computed(() => isEditMode.value && isResignedStatus(form.chefStatus));
 
@@ -189,7 +235,7 @@ const getList = async () => {
 };
 
 const resetQuery = () => {
-  Object.assign(queryParams, { pageNum: 1, chefName: '', mobile: '', chefStatus: '' });
+  Object.assign(queryParams, { pageNum: 1, chefName: '', mobile: '', chefStatus: '', auditStatus: '' });
   getList();
 };
 
@@ -225,8 +271,29 @@ const submit = async () => {
 };
 
 const handleAudit = async (row: ChefVO, auditStatus: string) => {
-  await auditChef({ ...row, auditStatus });
+  await auditChef({ chefId: row.chefId, auditStatus, auditReason: '' });
   proxy?.$modal.msgSuccess('审核已更新');
+  getList();
+};
+
+const handleRejectAudit = (row: ChefVO) => {
+  Object.assign(rejectAuditForm, {
+    chefId: row.chefId,
+    chefName: row.chefName,
+    auditReason: row.auditReason || ''
+  });
+  rejectAuditDialog.visible = true;
+};
+
+const submitRejectAudit = async () => {
+  const auditReason = String(rejectAuditForm.auditReason || '').trim();
+  if (!auditReason) {
+    proxy?.$modal.msgError('请填写驳回原因');
+    return;
+  }
+  await auditChef({ chefId: rejectAuditForm.chefId, auditStatus: '2', auditReason });
+  proxy?.$modal.msgSuccess('已驳回入驻申请');
+  rejectAuditDialog.visible = false;
   getList();
 };
 

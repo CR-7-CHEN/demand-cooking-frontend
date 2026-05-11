@@ -90,6 +90,7 @@ export interface SettlementVO extends CookingBaseForm {
   orderCount?: number;
   orderAmount?: number;
   baseSalary?: number;
+  chefCommission?: number;
   violationCount?: number;
   violationDeduction?: number;
   payableAmount?: number;

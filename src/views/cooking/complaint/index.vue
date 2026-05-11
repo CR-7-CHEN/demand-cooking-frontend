@@ -42,15 +42,28 @@
 <script setup name="CookingComplaint" lang="ts">
 import { handleComplaint, listComplaint } from '@/api/cooking/complaint';
 import type { ComplaintVO } from '@/api/cooking/complaint/types';
+import { useRoute } from 'vue-router';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
+const route = useRoute();
 const complaintStatusMap: Record<string, string> = { PENDING: '待处理', ESTABLISHED: '成立', REJECTED: '不成立' };
 const complaintStatusType: Record<string, string> = { PENDING: 'warning', ESTABLISHED: 'danger', REJECTED: 'info' };
 const complaintTypeMap: Record<string, string> = { SERVICE: '服务投诉' };
 const loading = ref(false);
 const rows = ref<ComplaintVO[]>([]);
 const total = ref(0);
-const queryParams = reactive<any>({ pageNum: 1, pageSize: 10, orderNo: '', userKeyword: '', chefName: '', status: '' });
+const routeQueryValue = (value: unknown) => {
+  const firstValue = Array.isArray(value) ? value[0] : value;
+  return typeof firstValue === 'string' ? firstValue : '';
+};
+const queryParams = reactive<any>({
+  pageNum: 1,
+  pageSize: 10,
+  orderNo: '',
+  userKeyword: '',
+  chefName: '',
+  status: routeQueryValue(route.query.status)
+});
 
 const getList = async () => {
   loading.value = true;
