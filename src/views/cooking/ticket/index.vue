@@ -119,11 +119,10 @@ const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
 const statusOptions = [
   { label: '待处理', value: 'PENDING' },
-  { label: '处理中', value: 'PROCESSING' },
   { label: '已回复', value: 'REPLIED' },
   { label: '已关闭', value: 'CLOSED' }
 ];
-const statusType: Record<string, TagType> = { PENDING: 'warning', PROCESSING: 'primary', REPLIED: 'success', CLOSED: 'info' };
+const statusType: Record<string, TagType> = { PENDING: 'warning', REPLIED: 'success', CLOSED: 'info' };
 
 const loading = ref(false);
 const detailLoading = ref(false);
