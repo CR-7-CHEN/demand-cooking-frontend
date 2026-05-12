@@ -16,4 +16,13 @@ describe('homepage recent order status copy', () => {
   it('does not directly echo raw backend status values in recent orders', () => {
     expect(homepageSource).not.toContain("statusLabel: order.statusLabel || order.status || '-'");
   });
+
+  it('keeps recent orders in a fixed-height scroll area with a view-all order link', () => {
+    expect(homepageSource).toContain('class="panel recent-orders-panel"');
+    expect(homepageSource).toContain('class="order-list recent-orders-scroll"');
+    expect(homepageSource).toContain('handleViewAllOrders');
+    expect(homepageSource).toContain("router.push('/cooking/order')");
+    expect(homepageSource).toMatch(/\.recent-orders-panel\s*{[^}]*height:\s*280px/s);
+    expect(homepageSource).toMatch(/\.recent-orders-scroll\s*{[^}]*overflow-y:\s*auto/s);
+  });
 });

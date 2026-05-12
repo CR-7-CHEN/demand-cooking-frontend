@@ -60,17 +60,33 @@
           </div>
         </article>
 
-        <article class="panel">
+        <article class="panel recent-orders-panel">
           <div class="panel__header compact">
             <h2>最新订单</h2>
+            <button type="button" class="panel-link" @click="handleViewAllOrders">查看全部</button>
           </div>
-          <div v-if="recentOrders.length" class="order-list">
+          <div v-if="recentOrders.length" class="order-list recent-orders-scroll">
             <div v-for="order in recentOrders" :key="order.orderNo" class="order-item">
               <span class="order-item__no">{{ order.orderNo }}</span>
               <span class="order-item__status" :class="order.tone">{{ order.statusLabel }}</span>
             </div>
           </div>
           <div v-else class="empty-state">暂无最新订单</div>
+        </article>
+
+        <article class="panel">
+          <div class="panel__header compact">
+            <h2>好评厨师 Top5</h2>
+          </div>
+          <div v-if="topRatedChefs.length" class="chef-rank-list">
+            <div v-for="(chef, index) in topRatedChefs" :key="chef.chefId" class="chef-rank-item">
+              <span class="chef-rank-item__index" :class="{ gold: index === 0, silver: index === 1, bronze: index === 2 }">{{ index + 1 }}</span>
+              <span class="chef-rank-item__name">{{ chef.chefName }}</span>
+              <span class="chef-rank-item__rating">{{ formatRating(chef.rating) }} 分</span>
+              <span class="chef-rank-item__orders">{{ formatCount(chef.completedOrders) }} 单</span>
+            </div>
+          </div>
+          <div v-else class="empty-state">暂无厨师数据</div>
         </article>
       </aside>
     </section>
@@ -79,7 +95,7 @@
 
 <script setup name="Index" lang="ts">
 import { getDashboardOverview } from '@/api/cooking/dashboard';
-import type { DashboardOverviewVO, DashboardPendingItem, DashboardRecentOrder } from '@/api/cooking/dashboard/types';
+import type { DashboardOverviewVO, DashboardPendingItem, DashboardRecentOrder, DashboardTopChef } from '@/api/cooking/dashboard/types';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -113,7 +129,8 @@ const defaultOverview: DashboardOverviewVO = {
   trendMode: 'week',
   revenueTrend: [],
   pendingItems: [],
-  recentOrders: []
+  recentOrders: [],
+  topRatedChefs: []
 };
 
 const defaultPendingItems: DisplayPendingItem[] = [
@@ -204,6 +221,14 @@ const handlePendingItemClick = (item: DisplayPendingItem) => {
   }
 };
 
+const handleViewAllOrders = () => {
+  router.push('/cooking/order');
+};
+
+const topRatedChefs = computed<DashboardTopChef[]>(() => {
+  return Array.isArray(dashboard.value.topRatedChefs) ? dashboard.value.topRatedChefs : [];
+});
+
 const recentOrders = computed<DisplayRecentOrder[]>(() => {
   const orders = Array.isArray(dashboard.value.recentOrders) ? dashboard.value.recentOrders : [];
   return orders.map((order) => ({
@@ -227,7 +252,8 @@ const loadDashboard = async () => {
       trendMode: data.trendMode || trendMode.value,
       revenueTrend: Array.isArray(data.revenueTrend) ? data.revenueTrend : [],
       pendingItems: Array.isArray(data.pendingItems) ? data.pendingItems : [],
-      recentOrders: Array.isArray(data.recentOrders) ? data.recentOrders : []
+      recentOrders: Array.isArray(data.recentOrders) ? data.recentOrders : [],
+      topRatedChefs: Array.isArray(data.topRatedChefs) ? data.topRatedChefs : []
     };
   } catch (error) {
     if (seq === requestSeq) {
@@ -295,6 +321,11 @@ const toNumber = (value: number | string | undefined | null) => {
 };
 
 const formatCount = (value: number | string | undefined | null) => new Intl.NumberFormat('zh-CN').format(toNumber(value));
+
+const formatRating = (value: number | string | undefined | null) => {
+  const num = toNumber(value);
+  return num.toFixed(1);
+};
 
 const formatCurrency = (value: number | string | undefined | null) => `¥${new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 2 }).format(toNumber(value))}`;
 
@@ -530,6 +561,19 @@ onMounted(loadDashboard);
   white-space: nowrap;
 }
 
+.panel-link {
+  border: 0;
+  color: #c8613f;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.4;
+
+  &:hover {
+    color: #a84e31;
+  }
+}
+
 .side-panels {
   display: grid;
   gap: 14px;
@@ -540,6 +584,18 @@ onMounted(loadDashboard);
 .order-list {
   display: grid;
   gap: 8px;
+}
+
+.recent-orders-panel {
+  display: flex;
+  flex-direction: column;
+  height: 280px;
+}
+
+.recent-orders-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .pending-item,
@@ -653,6 +709,76 @@ onMounted(loadDashboard);
   padding: 24px 0 12px;
   font-size: 13px;
   text-align: center;
+}
+
+.chef-rank-list {
+  display: grid;
+  gap: 4px;
+}
+
+.chef-rank-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 9px 0;
+  border-bottom: 1px dashed #ece5dc;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.chef-rank-item__index {
+  display: inline-flex;
+  flex: 0 0 24px;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: #7a7168;
+  background: #f0ebe4;
+  font-size: 13px;
+  font-weight: 700;
+
+  &.gold {
+    color: #fff;
+    background: #df7b50;
+  }
+
+  &.silver {
+    color: #fff;
+    background: #c8a96a;
+  }
+
+  &.bronze {
+    color: #fff;
+    background: #c8b89a;
+  }
+}
+
+.chef-rank-item__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chef-rank-item__rating {
+  flex: 0 0 auto;
+  color: #df7b50;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chef-rank-item__orders {
+  flex: 0 0 auto;
+  color: #7a7168;
+  font-size: 12px;
 }
 
 @media (max-width: 1100px) {
