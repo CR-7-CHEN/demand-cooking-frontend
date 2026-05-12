@@ -58,7 +58,7 @@
         </el-table-column>
         <el-table-column label="评分" prop="rating" min-width="90" />
         <el-table-column label="完成单数" prop="completedOrders" min-width="100" />
-        <el-table-column label="审核" min-width="100">
+        <el-table-column label="审核状态" min-width="100">
           <template #default="{ row }">
             <el-tag>{{ auditText(row.auditStatus) }}</el-tag>
           </template>
@@ -73,8 +73,8 @@
         <el-table-column label="操作" fixed="right" width="250" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
-            <el-button link type="success" @click="handleAudit(row, '1')">通过</el-button>
-            <el-button link type="danger" @click="handleRejectAudit(row)">驳回</el-button>
+            <el-button v-if="canAudit(row)" link type="success" @click="handleAudit(row, '1')">通过</el-button>
+            <el-button v-if="canAudit(row)" link type="danger" @click="handleRejectAudit(row)">驳回</el-button>
             <el-button link type="warning" @click="handleStatus(row, '1')">暂停</el-button>
           </template>
         </el-table-column>
@@ -399,6 +399,7 @@ const auditText = (value?: string) => ({ '0': '待审核', '1': '通过', '2': '
 const statusText = (value?: string) => ({ '0': '可接单', '1': '暂停', '2': '禁用', '3': '离职', APPROVED: '可接单', PAUSED: '暂停', DISABLED: '禁用', RESIGNED: '离职' })[value || ''] || value || '-';
 const genderText = (value?: string) => ({ '0': '男', '1': '女', '2': '未知' })[value || ''] || '-';
 const isResignedStatus = (value?: string) => ['3', 'RESIGNED'].includes(String(value || ''));
+const canAudit = (row: ChefVO) => ['', '0', 'PENDING'].includes(String(row.auditStatus || '').trim().toUpperCase());
 
 onMounted(getList);
 </script>

@@ -14,4 +14,11 @@ describe('cooking chef audit reject entry', () => {
     expect(source).not.toContain('请填写驳回原因，用户将在小程序端看到');
     expect(source).toContain("auditStatus: '2'");
   });
+
+  it('only shows audit actions for pending chefs and labels the column as 审核状态', () => {
+    expect(source).toContain('label="审核状态"');
+    expect(source).toContain('v-if="canAudit(row)"');
+    expect(source).toContain('const canAudit = (row: ChefVO) =>');
+    expect(source).toContain("['', '0', 'PENDING'].includes");
+  });
 });

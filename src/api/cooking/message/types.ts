@@ -29,6 +29,7 @@ export interface MessageQuery extends CookingBaseQuery {
   channel?: string;
   receiverType?: string;
   receiverId?: string | number;
+  receiverKeyword?: string;
   relatedOrderNo?: string;
   relatedBizType?: string;
   sendStatus?: string;

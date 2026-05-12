@@ -7,13 +7,8 @@
             <el-option v-for="item in messageTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="接收类型">
-          <el-select v-model="queryParams.receiverType" clearable style="width: 130px">
-            <el-option v-for="item in receiverTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="接收人">
-          <el-input v-model="queryParams.receiverId" clearable placeholder="用户/厨师ID" style="width: 140px" @keyup.enter="getList" />
+          <el-input v-model="queryParams.receiverKeyword" clearable placeholder="账号或服务厨师姓名" style="width: 220px" @keyup.enter="getList" />
         </el-form-item>
         <el-form-item label="订单号">
           <el-input v-model="queryParams.relatedOrderNo" clearable style="width: 160px" @keyup.enter="getList" />
@@ -28,14 +23,14 @@
             <el-option v-for="item in sendStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="记录时间">
+        <el-form-item label="发送时间">
           <el-date-picker
             v-model="dateRange"
             type="datetimerange"
             value-format="YYYY-MM-DD HH:mm:ss"
             range-separator="-"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间"
+            start-placeholder="发送开始时间"
+            end-placeholder="发送结束时间"
             style="width: 340px"
           />
         </el-form-item>
@@ -262,8 +257,7 @@ const queryParams = reactive<MessageQuery>({
   pageNum: 1,
   pageSize: 10,
   messageType: '',
-  receiverType: '',
-  receiverId: '',
+  receiverKeyword: '',
   relatedOrderNo: '',
   channel: '',
   sendStatus: ''
@@ -309,8 +303,7 @@ const resetQuery = () => {
   Object.assign(queryParams, {
     pageNum: 1,
     messageType: '',
-    receiverType: '',
-    receiverId: '',
+    receiverKeyword: '',
     relatedOrderNo: '',
     channel: '',
     sendStatus: ''
