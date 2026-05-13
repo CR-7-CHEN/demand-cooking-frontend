@@ -39,7 +39,7 @@
         </el-table-column>
         <el-table-column label="状态" prop="status" min-width="110">
           <template #default="{ row }">
-            <el-tag :type="statusTagType(row.status)">{{ optionText(statusOptions, row.status) }}</el-tag>
+            <el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="问题内容" min-width="260" show-overflow-tooltip>
@@ -54,8 +54,8 @@
         <el-table-column label="操作" fixed="right" width="240" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="View" @click="showDetail(row)">详情</el-button>
-            <el-button link type="success" icon="Edit" :disabled="row.status === 'CLOSED'" @click="handleReply(row)">处理</el-button>
-            <el-button link type="warning" icon="CircleClose" :disabled="row.status === 'CLOSED'" @click="handleClose(row)">关闭</el-button>
+            <el-button link type="success" icon="Edit" :disabled="isClosed(row.status)" @click="handleReply(row)">处理</el-button>
+            <el-button link type="warning" icon="CircleClose" :disabled="isClosed(row.status)" @click="handleClose(row)">关闭</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -66,7 +66,7 @@
       <el-descriptions v-loading="detailLoading" :column="2" border>
         <el-descriptions-item label="工单号">{{ current.ticketNo || current.ticketId || '-' }}</el-descriptions-item>
         <el-descriptions-item label="状态">
-          <el-tag :type="statusTagType(current.status)">{{ optionText(statusOptions, current.status) }}</el-tag>
+          <el-tag :type="statusTagType(current.status)">{{ statusText(current.status) }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="用户">{{ current.nickName || current.userName || current.userId || '-' }}</el-descriptions-item>
         <el-descriptions-item label="联系电话">{{ current.contactPhone || '-' }}</el-descriptions-item>
@@ -81,7 +81,7 @@
       </el-descriptions>
       <template #footer>
         <el-button @click="detail.visible = false">关闭</el-button>
-        <el-button v-if="current.status !== 'CLOSED'" type="primary" @click="handleReply(current)">处理</el-button>
+        <el-button v-if="!isClosed(current.status)" type="primary" @click="handleReply(current)">处理</el-button>
       </template>
     </el-dialog>
 
@@ -111,18 +111,12 @@
 <script setup name="CookingTicket" lang="ts">
 import { closeTicket, getTicket, listTicket, replyTicket } from '@/api/cooking/ticket';
 import type { TicketProcessForm, TicketQuery, TicketVO } from '@/api/cooking/ticket/types';
+import { cookingSupportTicketStatus, normalizeSupportTicketStatus, supportTicketStatusOptions, supportTicketStatusTagType, supportTicketStatusText } from '@/api/cooking/status';
 import type { FormInstance, FormRules } from 'element-plus';
-
-type TagType = 'primary' | 'success' | 'info' | 'warning' | 'danger';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
-const statusOptions = [
-  { label: '待处理', value: 'PENDING' },
-  { label: '已回复', value: 'REPLIED' },
-  { label: '已关闭', value: 'CLOSED' }
-];
-const statusType: Record<string, TagType> = { PENDING: 'warning', REPLIED: 'success', CLOSED: 'info' };
+const statusOptions = supportTicketStatusOptions;
 
 const loading = ref(false);
 const detailLoading = ref(false);
@@ -138,9 +132,9 @@ const replyRules: FormRules = {
   processReply: [{ required: true, message: '请输入处理回复', trigger: 'blur' }]
 };
 
-const optionText = (options: Array<{ label: string; value: string }>, value?: string) =>
-  options.find((item) => item.value === value)?.label || value || '-';
-const statusTagType = (value?: string): TagType => statusType[value || ''] || 'info';
+const statusText = supportTicketStatusText;
+const statusTagType = supportTicketStatusTagType;
+const isClosed = (value?: string | number) => normalizeSupportTicketStatus(value) === cookingSupportTicketStatus.CLOSED;
 
 const resetCurrent = () => {
   Object.keys(current).forEach((key) => delete (current as Record<string, any>)[key]);

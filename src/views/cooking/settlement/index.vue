@@ -64,6 +64,7 @@
         <el-descriptions-item label="处理说明" :span="2">{{ current.reviewReply || '-' }}</el-descriptions-item>
         <el-descriptions-item label="确认时间">{{ formatTime(current.confirmTime) }}</el-descriptions-item>
         <el-descriptions-item label="发放时间">{{ formatTime(current.payTime) }}</el-descriptions-item>
+        <el-descriptions-item label="打款说明" :span="2">{{ current.payRemark || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
 
@@ -92,23 +93,43 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="payDialog.visible" title="确认发放" width="520px" append-to-body>
+      <el-form label-width="100px">
+        <el-form-item label="结算月份">
+          <span>{{ payDialog.settlementMonth || '-' }}</span>
+        </el-form-item>
+        <el-form-item label="服务厨师">
+          <span>{{ payDialog.chefName || '-' }}</span>
+        </el-form-item>
+        <el-form-item label="打款说明" required>
+          <el-input v-model="payForm.payRemark" type="textarea" :rows="4" maxlength="500" show-word-limit />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="payDialog.visible = false">取消</el-button>
+          <el-button type="primary" @click="submitPay">提交</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup name="CookingSettlement" lang="ts">
 import { generateSettlement, getSettlement, listSettlement, paySettlement, resolveSettlementReview } from '@/api/cooking/settlement';
 import type { SettlementForm, SettlementPayForm, SettlementQuery, SettlementReviewResolveForm, SettlementVO } from '@/api/cooking/settlement/types';
+import {
+  cookingSettlementStatus,
+  normalizeSettlementStatus,
+  settlementStatusOptions,
+  settlementStatusTagType,
+  settlementStatusText
+} from '@/api/cooking/status';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
-type SettlementStatusTagType = 'success' | 'info' | 'warning' | 'danger' | 'primary';
-
-const statusOptions: Array<{ label: string; value: string; type: SettlementStatusTagType }> = [
-  { label: '已生成', value: 'GENERATED', type: 'info' },
-  { label: '复核中', value: 'REVIEWING', type: 'warning' },
-  { label: '已确认', value: 'CONFIRMED', type: 'primary' },
-  { label: '已发放', value: 'PAID', type: 'success' }
-];
+const statusOptions = settlementStatusOptions;
 
 const resolveActionOptions = [
   { label: 'KEEP', value: 'KEEP' },
@@ -140,6 +161,15 @@ const resolveDialog = reactive<{ visible: boolean; settlementId?: string | numbe
 const resolveForm = reactive<SettlementReviewResolveForm>({
   reviewResult: 'KEEP',
   reviewReply: ''
+});
+const payDialog = reactive<{ visible: boolean; settlementId?: string | number; settlementMonth?: string; chefName?: string }>({
+  visible: false,
+  settlementId: undefined,
+  settlementMonth: '',
+  chefName: ''
+});
+const payForm = reactive<SettlementPayForm>({
+  payRemark: ''
 });
 
 const getList = async () => {
@@ -211,17 +241,33 @@ const submitResolveReview = async () => {
 
 const handlePay = async (row: SettlementVO) => {
   if (!row.settlementId) return;
-  await proxy?.$modal.confirm(`是否确认将 ${row.settlementMonth || '-'} ${chefDisplay(row)} 的结算标记为已发放？`);
-  const payload: SettlementPayForm = { settlementId: row.settlementId };
+  payDialog.visible = true;
+  payDialog.settlementId = row.settlementId;
+  payDialog.settlementMonth = row.settlementMonth;
+  payDialog.chefName = chefDisplay(row);
+  payForm.payRemark = row.payRemark || '';
+};
+
+const submitPay = async () => {
+  if (!payDialog.settlementId) return;
+  if (!String(payForm.payRemark || '').trim()) {
+    proxy?.$modal.msgError('请填写打款说明');
+    return;
+  }
+  const payload: SettlementPayForm = {
+    settlementId: payDialog.settlementId,
+    payRemark: String(payForm.payRemark || '').trim()
+  };
   await paySettlement(payload);
   proxy?.$modal.msgSuccess('结算已标记为已发放');
+  payDialog.visible = false;
   getList();
 };
 
-const isReviewing = (row: SettlementVO) => String(row.status || '').toUpperCase() === 'REVIEWING';
-const isConfirmed = (row: SettlementVO) => String(row.status || '').toUpperCase() === 'CONFIRMED';
-const statusText = (value?: string) => statusOptions.find((item) => item.value === value)?.label || value || '-';
-const statusTag = (value?: string): SettlementStatusTagType => statusOptions.find((item) => item.value === value)?.type || 'info';
+const isReviewing = (row: SettlementVO) => normalizeSettlementStatus(row.status) === cookingSettlementStatus.REVIEWING;
+const isConfirmed = (row: SettlementVO) => normalizeSettlementStatus(row.status) === cookingSettlementStatus.CONFIRMED;
+const statusText = settlementStatusText;
+const statusTag = settlementStatusTagType;
 const chefDisplay = (row: SettlementVO) => row.chefName || row.chefId || '-';
 const reviewReasonText = (row: SettlementVO) => row.reviewReason || row.reviewReasonType || '-';
 const reviewActionText = (value?: string) => resolveActionOptions.find((item) => item.value === value)?.label || value || '-';

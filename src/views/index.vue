@@ -96,28 +96,12 @@
 <script setup name="Index" lang="ts">
 import { getDashboardOverview } from '@/api/cooking/dashboard';
 import type { DashboardOverviewVO, DashboardPendingItem, DashboardRecentOrder, DashboardTopChef } from '@/api/cooking/dashboard/types';
+import { cookingComplaintStatus, orderStatusText, orderStatusTone } from '@/api/cooking/status';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 type DisplayPendingItem = Required<Pick<DashboardPendingItem, 'key' | 'label' | 'count' | 'tone'>>;
 type DisplayRecentOrder = DashboardRecentOrder & { tone: string };
-
-const recentOrderStatusTextMap: Record<string, string> = {
-  WAITING_RESPONSE: '待响应',
-  REJECTED_CLOSED: '已拒单',
-  RESPONSE_TIMEOUT_CLOSED: '响应超时关闭',
-  WAITING_PAY: '待支付',
-  PRICE_OBJECTION: '异议中',
-  OBJECTION_TIMEOUT_CLOSED: '异议超时关闭',
-  PAY_TIMEOUT_CLOSED: '支付超时关闭',
-  WAITING_SERVICE: '待服务',
-  WAITING_CONFIRM: '待确认',
-  COMPLETED: '已完成',
-  CANCELED: '已取消',
-  REFUNDING: '退款中',
-  REFUNDED: '已退款',
-  REFUND_FAILED: '退款失败'
-};
 
 const defaultOverview: DashboardOverviewVO = {
   todayOrders: 0,
@@ -147,7 +131,7 @@ let requestSeq = 0;
 
 const pendingItemRoutes: Record<string, { path: string; query: Record<string, string> }> = {
   chefAudit: { path: '/cooking/chef', query: { auditStatus: '0' } },
-  complaintReply: { path: '/cooking/complaint', query: { status: 'PENDING' } }
+  complaintReply: { path: '/cooking/complaint', query: { status: cookingComplaintStatus.PENDING } }
 };
 
 const todayText = computed(() => {
@@ -343,7 +327,7 @@ const recentOrderStatusText = (order: DashboardRecentOrder) => {
     .filter((item): item is string => Boolean(item));
 
   for (const candidate of statusCandidates) {
-    const mapped = recentOrderStatusTextMap[candidate.toUpperCase()];
+    const mapped = orderStatusText(candidate);
     if (mapped) {
       return mapped;
     }
@@ -352,13 +336,7 @@ const recentOrderStatusText = (order: DashboardRecentOrder) => {
   return order.statusLabel || order.status || '-';
 };
 
-const orderTone = (status?: string) => {
-  const normalized = (status || '').toUpperCase();
-  if (['COMPLETED', 'CONFIRMED', 'PAID'].some((item) => normalized.includes(item))) return 'success';
-  if (['WAITING', 'PENDING', 'REFUND'].some((item) => normalized.includes(item))) return 'warning';
-  if (['CANCEL', 'REJECT', 'FAIL'].some((item) => normalized.includes(item))) return 'danger';
-  return 'progress';
-};
+const orderTone = orderStatusTone;
 
 onMounted(loadDashboard);
 </script>

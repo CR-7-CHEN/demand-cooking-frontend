@@ -13,6 +13,7 @@ describe('cooking message enum alignment', () => {
 
   it('supports the real stored message channel and send status values', () => {
     expect(messagePageSource).toContain("IN_APP");
-    expect(messagePageSource).toContain("SENT");
+    expect(messagePageSource).toContain('messageSendStatusOptions');
+    expect(messagePageSource).toContain('cookingMessageSendStatus.SENT');
   });
 });

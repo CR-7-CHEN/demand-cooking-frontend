@@ -173,6 +173,7 @@
 <script setup name="CookingMessage" lang="ts">
 import { addMessage, delMessage, getMessage, listMessage, updateMessage } from '@/api/cooking/message';
 import type { MessageForm, MessageQuery, MessageVO } from '@/api/cooking/message/types';
+import { cookingMessageSendStatus, messageSendStatusOptions, messageSendStatusTagType, messageSendStatusText } from '@/api/cooking/status';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 
@@ -208,9 +209,7 @@ const channelOptions = [
   { label: '短信', value: 'SMS' }
 ];
 const sendStatusOptions = [
-  { label: '待发送', value: 'PENDING' },
-  { label: '已发送', value: 'SENT' },
-  { label: '发送失败', value: 'FAILED' }
+  ...messageSendStatusOptions
 ];
 const bizTypeOptions = [
   { label: '订单', value: 'ORDER' },
@@ -220,7 +219,6 @@ const bizTypeOptions = [
   { label: '厨师', value: 'CHEF' },
   { label: '配置', value: 'CONFIG' }
 ];
-type TagType = 'primary' | 'success' | 'info' | 'warning' | 'danger';
 const messageTypeTextMap: Record<string, string> = Object.fromEntries(messageTypeOptions.map((item) => [item.value, item.label]));
 Object.assign(messageTypeTextMap, {
   ORDER: '订单通知',
@@ -233,21 +231,6 @@ const channelTextMap: Record<string, string> = {
   SMS: '短信',
   APP: 'App'
 };
-const sendStatusTextMap: Record<string, string> = {
-  PENDING: '待发送',
-  SENDING: '发送中',
-  SENT: '已发送',
-  SUCCESS: '已发送',
-  FAILED: '发送失败'
-};
-const sendStatusType: Record<string, TagType> = {
-  PENDING: 'info',
-  SENDING: 'warning',
-  SENT: 'success',
-  SUCCESS: 'success',
-  FAILED: 'danger'
-};
-
 const loading = ref(false);
 const detailLoading = ref(false);
 const rows = ref<MessageVO[]>([]);
@@ -272,8 +255,6 @@ const optionText = (options: Array<{ label: string; value: string }>, value?: st
 const enumText = (textMap: Record<string, string>, value?: string) => textMap[String(value || '').toUpperCase()] || value || '-';
 const messageTypeText = (value?: string) => enumText(messageTypeTextMap, value);
 const channelText = (value?: string) => enumText(channelTextMap, value);
-const sendStatusText = (value?: string) => enumText(sendStatusTextMap, value);
-const sendStatusTagType = (value?: string): TagType => sendStatusType[String(value || '').toUpperCase()] || 'info';
 const receiverDisplay = (row: MessageVO) => {
   const receiverType = optionText(receiverTypeOptions, row.receiverType);
   const receiverName = row.receiverName || row.userName || row.nickName || row.chefName;
@@ -318,7 +299,7 @@ const resetRecord = () => {
 
 const resetForm = () => {
   Object.keys(form).forEach((key) => delete (form as Record<string, any>)[key]);
-  Object.assign(form, { messageType: '', channel: 'IN_APP', receiverType: '', sendStatus: 'SENT' });
+  Object.assign(form, { messageType: '', channel: 'IN_APP', receiverType: '', sendStatus: cookingMessageSendStatus.SENT });
 };
 
 const showDetail = async (row: MessageVO) => {

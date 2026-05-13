@@ -4,9 +4,11 @@ import { describe, expect, it } from 'vitest';
 
 const cookingModules = ['address', 'area', 'message', 'review', 'faq', 'ticket'];
 const adaptiveListModules = ['chef', 'order', 'dish', 'complaint', 'settlement', 'config', 'address', 'area', 'message', 'review', 'faq', 'ticket'];
+const backendRoot = resolve(__dirname, '..', '..', '..', 'demand-cooking-backend');
 
 const readPage = (moduleName: string) => readFileSync(resolve(__dirname, 'cooking', moduleName, 'index.vue'), 'utf8');
-const readBackendInitSql = () => readFileSync(resolve(__dirname, '..', '..', '..', '..', 'backend', 'demand-cooking-backend', 'script', 'sql', 'demand_cooking.sql'), 'utf8');
+const readBackendInitSql = () => readFileSync(resolve(backendRoot, 'script', 'sql', 'demand_cooking.sql'), 'utf8');
+const readCookingStatus = () => readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'status.ts'), 'utf8');
 const firstBlock = (source: string, start: string, end: string) => {
   const startIndex = source.indexOf(start);
   expect(startIndex, `${start} exists`).toBeGreaterThanOrEqual(0);
@@ -56,6 +58,7 @@ describe('cooking dynamic menu pages', () => {
     const orderTable = mainTable(readPage('order'));
     const dishPage = readPage('dish');
     const orderPage = readPage('order');
+    const statusSource = readCookingStatus();
     const orderApi = readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'order', 'index.ts'), 'utf8');
     const orderTypes = readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'types.ts'), 'utf8');
 
@@ -102,13 +105,14 @@ describe('cooking dynamic menu pages', () => {
     expect(readPage('chef')).toContain('v-model="form.resignReason" type="textarea" :rows="2" :disabled="!canEditResignReason"');
     expect(readPage('chef')).toContain("const payload: any = { chefId: form.chefId, chefStatus: form.chefStatus, baseSalary: form.baseSalary }");
     expect(readPage('chef')).toContain('payload.resignReason = form.resignReason');
-    expect(readPage('chef')).toContain("const isResignedStatus = (value?: string) => ['3', 'RESIGNED'].includes(String(value || ''))");
+    expect(readPage('chef')).toContain("const isResignedStatus = (value?: string | number) => normalizeChefStatus(value) === '3'");
     expect(chefTable).toContain('label="底薪" prop="baseSalary"');
     expect(chefTable.indexOf('prop="mobile"')).toBeLessThan(chefTable.indexOf('prop="baseSalary"'));
     expect(readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'types.ts'), 'utf8')).toContain('age?: number');
     expect(orderTable.indexOf('label="订单号"')).toBeLessThan(orderTable.indexOf('label="服务厨师"'));
     expect(orderTable).toContain('prop="serviceStartedTime"');
-    expect(orderPage).toContain("WAITING_CONFIRM: '用户待确认'");
+    expect(statusSource).toContain("[cookingOrderStatus.WAITING_CONFIRM]: '用户待确认'");
+    expect(statusSource).toContain("WAITING_CONFIRM: '4'");
     expect(orderApi).toContain("/cooking/order/serviceStart");
     expect(orderTypes).toContain('serviceStartedTime?: string');
     expect(orderTypes).toContain('serviceStartedFlag?: string');
@@ -162,11 +166,12 @@ describe('cooking dynamic menu pages', () => {
 
   it('matches settlement review and pay workflow requirements', () => {
     const settlementPage = readPage('settlement');
+    const statusSource = readCookingStatus();
     const settlementTable = mainTable(settlementPage);
     const settlementApi = readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'settlement', 'index.ts'), 'utf8');
     const settlementTypes = readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'types.ts'), 'utf8');
 
-    expect(settlementPage).toContain('REVIEWING');
+    expect(statusSource).toContain("REVIEWING: '1'");
     expect(settlementPage).toContain('label="操作"');
     expect(settlementTable).toContain('handleView(row)');
     expect(settlementTable).toContain('handleResolveReview(row)');
@@ -188,12 +193,16 @@ describe('cooking dynamic menu pages', () => {
 
   it('uses backend complaint status constants on the admin complaint page', () => {
     const complaintPage = readPage('complaint');
+    const statusSource = readCookingStatus();
 
-    expect(complaintPage).toContain('value="ESTABLISHED"');
-    expect(complaintPage).toContain('value="REJECTED"');
-    expect(complaintPage).toContain("ESTABLISHED: '成立'");
-    expect(complaintPage).toContain("REJECTED: '不成立'");
-    expect(complaintPage).toContain("status: established ? 'ESTABLISHED' : 'REJECTED'");
+    expect(complaintPage).toContain('complaintStatusOptions');
+    expect(statusSource).toContain("PENDING: '0'");
+    expect(statusSource).toContain("ESTABLISHED: '1'");
+    expect(statusSource).toContain("REJECTED: '2'");
+    expect(statusSource).toContain("[cookingComplaintStatus.PENDING]: '待处理'");
+    expect(statusSource).toContain("[cookingComplaintStatus.ESTABLISHED]: '成立'");
+    expect(statusSource).toContain("[cookingComplaintStatus.REJECTED]: '不成立'");
+    expect(complaintPage).toContain('status: handleForm.established ? cookingComplaintStatus.ESTABLISHED : cookingComplaintStatus.REJECTED');
     expect(complaintPage).not.toContain('value="VALID"');
     expect(complaintPage).not.toContain('value="INVALID"');
   });
@@ -203,9 +212,9 @@ describe('cooking dynamic menu pages', () => {
     const complaintForm = searchForm(complaintPage);
     const complaintTable = mainTable(complaintPage);
     const cookingTypes = readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'types.ts'), 'utf8');
-    const complaintBo = readFileSync('D:/backend/demand-cooking-backend/ruoyi-modules/ruoyi-system/src/main/java/org/dromara/system/domain/bo/cooking/DcCookComplaintBo.java', 'utf8');
-    const complaintVo = readFileSync('D:/backend/demand-cooking-backend/ruoyi-modules/ruoyi-system/src/main/java/org/dromara/system/domain/vo/cooking/DcCookComplaintVo.java', 'utf8');
-    const complaintService = readFileSync('D:/backend/demand-cooking-backend/ruoyi-modules/ruoyi-system/src/main/java/org/dromara/system/service/impl/cooking/DcCookComplaintServiceImpl.java', 'utf8');
+    const complaintBo = readFileSync(resolve(backendRoot, 'ruoyi-modules', 'ruoyi-system', 'src', 'main', 'java', 'org', 'dromara', 'system', 'domain', 'bo', 'cooking', 'DcCookComplaintBo.java'), 'utf8');
+    const complaintVo = readFileSync(resolve(backendRoot, 'ruoyi-modules', 'ruoyi-system', 'src', 'main', 'java', 'org', 'dromara', 'system', 'domain', 'vo', 'cooking', 'DcCookComplaintVo.java'), 'utf8');
+    const complaintService = readFileSync(resolve(backendRoot, 'ruoyi-modules', 'ruoyi-system', 'src', 'main', 'java', 'org', 'dromara', 'system', 'service', 'impl', 'cooking', 'DcCookComplaintServiceImpl.java'), 'utf8');
 
     expect(complaintForm).toContain('queryParams.userKeyword');
     expect(complaintForm).toContain('queryParams.chefName');
@@ -238,8 +247,10 @@ describe('cooking dynamic menu pages', () => {
     expect(initSql).toContain('cooking:supportTicket:list');
     expect(initSql).toContain('cooking:supportFaq:add');
     expect(initSql).toContain('cooking:supportTicket:handle');
-    expect(initSql).toContain('ESTABLISHED');
-    expect(initSql).toContain('REJECTED');
+    expect(initSql).toContain('0待处理');
+    expect(initSql).toContain('1成立');
+    expect(initSql).toContain('2不成立');
+    expect(initSql).toContain("WHEN 'PENDING' THEN '0'");
     expect(initSql).not.toContain('VALID成立');
     expect(initSql).not.toContain('INVALID不成立');
   });

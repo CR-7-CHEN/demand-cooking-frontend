@@ -19,6 +19,7 @@ describe('cooking chef audit reject entry', () => {
     expect(source).toContain('label="审核状态"');
     expect(source).toContain('v-if="canAudit(row)"');
     expect(source).toContain('const canAudit = (row: ChefVO) =>');
-    expect(source).toContain("['', '0', 'PENDING'].includes");
+    expect(source).toContain("PENDING: '0'");
+    expect(source).toContain("['', '0'].includes(normalizeAuditStatus(row.auditStatus))");
   });
 });
