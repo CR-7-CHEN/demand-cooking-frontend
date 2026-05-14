@@ -110,7 +110,10 @@ describe('cooking dynamic menu pages', () => {
     expect(chefTable.indexOf('prop="mobile"')).toBeLessThan(chefTable.indexOf('prop="baseSalary"'));
     expect(readFileSync(resolve(__dirname, '..', 'api', 'cooking', 'types.ts'), 'utf8')).toContain('age?: number');
     expect(orderTable.indexOf('label="订单号"')).toBeLessThan(orderTable.indexOf('label="服务厨师"'));
+    expect(orderTable).toContain('label="真实开始服务时间"');
     expect(orderTable).toContain('prop="serviceStartedTime"');
+    expect(orderPage).toContain('label="真实开始服务时间"');
+    expect(orderPage).toContain('current.serviceStartedTime');
     expect(statusSource).toContain("[cookingOrderStatus.WAITING_CONFIRM]: '用户待确认'");
     expect(statusSource).toContain("WAITING_CONFIRM: '4'");
     expect(orderApi).toContain("/cooking/order/serviceStart");

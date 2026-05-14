@@ -26,7 +26,7 @@
           <template #default="{ row }">{{ userDisplay(row) }}</template>
         </el-table-column>
         <el-table-column label="上门时间" prop="serviceStartTime" min-width="170" />
-        <el-table-column label="开始服务时间" prop="serviceStartedTime" min-width="170" />
+        <el-table-column label="真实开始服务时间" prop="serviceStartedTime" min-width="170" />
         <el-table-column label="状态" min-width="140">
           <template #default="{ row }"><el-tag>{{ statusText(row.status) }}</el-tag></template>
         </el-table-column>
@@ -62,7 +62,7 @@
         <div class="section-header"><span class="section-title">服务信息</span></div>
         <el-descriptions :column="2" border>
           <el-descriptions-item label="上门时间">{{ current.serviceStartTime || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="开始服务时间">{{ current.serviceStartedTime || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="真实开始服务时间">{{ current.serviceStartedTime || '-' }}</el-descriptions-item>
           <el-descriptions-item label="服务完成时间">{{ current.serviceCompleteTime || '-' }}</el-descriptions-item>
           <el-descriptions-item label="确认完成时间">{{ current.confirmTime || '-' }}</el-descriptions-item>
           <el-descriptions-item label="服务区域">{{ current.serviceArea || '-' }}</el-descriptions-item>
