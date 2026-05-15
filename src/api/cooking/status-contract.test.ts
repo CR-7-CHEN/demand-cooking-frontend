@@ -20,7 +20,7 @@ describe('cooking numeric status contract', () => {
     expect(source).toContain("REFUND_FAILED: '13'");
     expect(source).toContain('cookingMessageSendStatus');
     expect(source).toContain("SENDING: '3'");
-    expect(source).toContain('cookingSupportTicketStatus');
-    expect(source).toContain("CLOSED: '2'");
+    expect(source).not.toContain('cookingSupportTicketStatus');
+    expect(source).not.toContain('normalizeSupportTicketStatus');
   });
 });

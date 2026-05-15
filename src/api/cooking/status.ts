@@ -50,12 +50,6 @@ export const cookingMessageSendStatus = {
   SENDING: '3'
 } as const;
 
-export const cookingSupportTicketStatus = {
-  PENDING: '0',
-  REPLIED: '1',
-  CLOSED: '2'
-} as const;
-
 const orderLegacyToNumeric: Record<string, string> = {
   WAITING_RESPONSE: cookingOrderStatus.WAITING_RESPONSE,
   WAITING_PAY: cookingOrderStatus.WAITING_PAY,
@@ -96,17 +90,10 @@ const messageSendLegacyToNumeric: Record<string, string> = {
   SENDING: cookingMessageSendStatus.SENDING
 };
 
-const supportTicketLegacyToNumeric: Record<string, string> = {
-  PENDING: cookingSupportTicketStatus.PENDING,
-  REPLIED: cookingSupportTicketStatus.REPLIED,
-  CLOSED: cookingSupportTicketStatus.CLOSED
-};
-
 export const normalizeOrderStatus = (value?: string | number) => normalizeStatus(value, orderLegacyToNumeric);
 export const normalizeComplaintStatus = (value?: string | number) => normalizeStatus(value, complaintLegacyToNumeric);
 export const normalizeSettlementStatus = (value?: string | number) => normalizeStatus(value, settlementLegacyToNumeric);
 export const normalizeMessageSendStatus = (value?: string | number) => normalizeStatus(value, messageSendLegacyToNumeric);
-export const normalizeSupportTicketStatus = (value?: string | number) => normalizeStatus(value, supportTicketLegacyToNumeric);
 
 export const orderStatusTextMap: Record<string, string> = {
   [cookingOrderStatus.WAITING_RESPONSE]: '待响应',
@@ -172,12 +159,6 @@ export const messageSendStatusOptions: Array<{ label: string; value: string; typ
   { label: '发送中', value: cookingMessageSendStatus.SENDING, type: 'warning' }
 ];
 
-export const supportTicketStatusOptions: Array<{ label: string; value: string; type: TagType }> = [
-  { label: '待处理', value: cookingSupportTicketStatus.PENDING, type: 'warning' },
-  { label: '已回复', value: cookingSupportTicketStatus.REPLIED, type: 'success' },
-  { label: '已关闭', value: cookingSupportTicketStatus.CLOSED, type: 'info' }
-];
-
 export const orderStatusText = (value?: string | number) => {
   const normalized = normalizeOrderStatus(value);
   return orderStatusTextMap[normalized] || String(value || '') || '-';
@@ -226,16 +207,6 @@ export const messageSendStatusText = (value?: string | number) => {
 export const messageSendStatusTagType = (value?: string | number): TagType => {
   const normalized = normalizeMessageSendStatus(value);
   return messageSendStatusOptions.find((item) => item.value === normalized)?.type || 'info';
-};
-
-export const supportTicketStatusText = (value?: string | number) => {
-  const normalized = normalizeSupportTicketStatus(value);
-  return supportTicketStatusOptions.find((item) => item.value === normalized)?.label || String(value || '') || '-';
-};
-
-export const supportTicketStatusTagType = (value?: string | number): TagType => {
-  const normalized = normalizeSupportTicketStatus(value);
-  return supportTicketStatusOptions.find((item) => item.value === normalized)?.type || 'info';
 };
 
 function normalizeStatus(value: string | number | undefined, legacyMap: Record<string, string>) {

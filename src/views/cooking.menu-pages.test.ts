@@ -2,8 +2,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-const cookingModules = ['address', 'area', 'message', 'review', 'faq', 'ticket'];
-const adaptiveListModules = ['chef', 'order', 'dish', 'complaint', 'settlement', 'config', 'address', 'area', 'message', 'review', 'faq', 'ticket'];
+const cookingModules = ['address', 'area', 'message', 'review'];
+const adaptiveListModules = ['chef', 'order', 'dish', 'complaint', 'settlement', 'config', 'address', 'area', 'message', 'review'];
 const backendRoot = resolve(__dirname, '..', '..', '..', 'demand-cooking-backend');
 
 const readPage = (moduleName: string) => readFileSync(resolve(__dirname, 'cooking', moduleName, 'index.vue'), 'utf8');
@@ -116,7 +116,7 @@ describe('cooking dynamic menu pages', () => {
     expect(orderPage).toContain('current.serviceStartedTime');
     expect(statusSource).toContain("[cookingOrderStatus.WAITING_CONFIRM]: '用户待确认'");
     expect(statusSource).toContain("WAITING_CONFIRM: '4'");
-    expect(orderApi).toContain("/cooking/order/serviceStart");
+    expect(orderApi).toContain('/cooking/order/serviceStart');
     expect(orderTypes).toContain('serviceStartedTime?: string');
     expect(orderTypes).toContain('serviceStartedFlag?: string');
     expect(dishPage).toContain('<ImageUpload v-model="form.imageUrl" :limit="1"');
@@ -238,21 +238,18 @@ describe('cooking dynamic menu pages', () => {
     expect(complaintService).toContain('resolveChefIds(bo.getChefName())');
   });
 
-  it('keeps backend init sql aligned with cooking support admin pages', () => {
+  it('keeps backend init sql aligned after removing the legacy support admin pages', () => {
     const initSql = readBackendInitSql();
 
     expect(initSql).toContain('CREATE TABLE IF NOT EXISTS dc_cook_faq');
     expect(initSql).toContain('CREATE TABLE IF NOT EXISTS dc_cook_support_ticket');
-    expect(initSql).toContain('INSERT INTO dc_cook_faq');
-    expect(initSql).toContain('cooking/faq/index');
-    expect(initSql).toContain('cooking/ticket/index');
-    expect(initSql).toContain('cooking:supportFaq:list');
-    expect(initSql).toContain('cooking:supportTicket:list');
-    expect(initSql).toContain('cooking:supportFaq:add');
-    expect(initSql).toContain('cooking:supportTicket:handle');
-    expect(initSql).toContain('0待处理');
-    expect(initSql).toContain('1成立');
-    expect(initSql).toContain('2不成立');
+    expect(initSql).not.toContain('INSERT INTO dc_cook_faq');
+    expect(initSql).not.toContain('cooking/faq/index');
+    expect(initSql).not.toContain('cooking/ticket/index');
+    expect(initSql).not.toContain('cooking:supportFaq:list');
+    expect(initSql).not.toContain('cooking:supportTicket:list');
+    expect(initSql).not.toContain('cooking:supportFaq:add');
+    expect(initSql).not.toContain('cooking:supportTicket:handle');
     expect(initSql).toContain("WHEN 'PENDING' THEN '0'");
     expect(initSql).not.toContain('VALID成立');
     expect(initSql).not.toContain('INVALID不成立');
