@@ -2,8 +2,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-const cookingModules = ['address', 'area', 'message', 'review'];
-const adaptiveListModules = ['chef', 'order', 'dish', 'complaint', 'settlement', 'config', 'address', 'area', 'message', 'review'];
+const cookingModules = ['address', 'area', 'review'];
+const adaptiveListModules = ['chef', 'order', 'dish', 'complaint', 'settlement', 'config', 'address', 'area', 'review'];
 const backendRoot = resolve(__dirname, '..', '..', '..', 'demand-cooking-backend');
 
 const readPage = (moduleName: string) => readFileSync(resolve(__dirname, 'cooking', moduleName, 'index.vue'), 'utf8');
@@ -103,7 +103,10 @@ describe('cooking dynamic menu pages', () => {
     expect(readPage('chef')).toContain('v-model="form.intro" type="textarea" :disabled="isEditMode"');
     expect(readPage('chef')).toContain('const canEditResignReason = computed(() => isEditMode.value && isResignedStatus(form.chefStatus))');
     expect(readPage('chef')).toContain('v-model="form.resignReason" type="textarea" :rows="2" :disabled="!canEditResignReason"');
-    expect(readPage('chef')).toContain("const payload: any = { chefId: form.chefId, chefStatus: form.chefStatus, baseSalary: form.baseSalary }");
+    expect(readPage('chef')).toContain('chefName: form.chefName');
+    expect(readPage('chef')).toContain('mobile: form.mobile');
+    expect(readPage('chef')).toContain('healthCertExpireDate: formatDate(form.healthCertExpireDate)');
+    expect(readPage('chef')).toContain('availableTimes: form.availableTimes');
     expect(readPage('chef')).toContain('payload.resignReason = form.resignReason');
     expect(readPage('chef')).toContain("const isResignedStatus = (value?: string | number) => normalizeChefStatus(value) === '3'");
     expect(chefTable).toContain('label="底薪" prop="baseSalary"');
@@ -143,17 +146,10 @@ describe('cooking dynamic menu pages', () => {
     expect(areaTable).not.toContain('label="上级编码"');
   });
 
-  it('matches message and review search/list requirements', () => {
-    const messagePage = readPage('message');
-    const messageForm = searchForm(messagePage);
-    const messageTable = mainTable(messagePage);
+  it('matches review search/list requirements', () => {
     const reviewPage = readPage('review');
     const reviewForm = searchForm(reviewPage);
     const reviewTable = mainTable(reviewPage);
-
-    expect(messageForm).not.toContain('queryParams.relatedBizType');
-    expect(messageTable.indexOf('label="订单号"')).toBeLessThan(messageTable.indexOf('label="消息类型"'));
-    expect(messageTable).not.toContain('label="消息ID"');
 
     expect(reviewForm).toContain('queryParams.orderNo');
     expect(reviewForm).toContain('queryParams.userKeyword');

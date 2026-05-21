@@ -263,7 +263,24 @@ const handleEdit = (row: ChefVO) => {
 
 const submit = async () => {
   if (form.chefId) {
-    const payload: any = { chefId: form.chefId, chefStatus: form.chefStatus, baseSalary: form.baseSalary };
+    const payload: any = {
+      chefId: form.chefId,
+      chefName: form.chefName,
+      mobile: form.mobile,
+      gender: form.gender,
+      age: form.age,
+      avatarUrl: form.avatarUrl,
+      workImageUrls: form.workImageUrls,
+      healthCertImageUrl: form.healthCertImageUrl,
+      healthCertExpireDate: formatDate(form.healthCertExpireDate),
+      intro: form.intro,
+      specialties: form.specialties ?? form.skillTags,
+      skillTags: form.skillTags,
+      serviceArea: form.serviceArea,
+      availableTimes: form.availableTimes,
+      baseSalary: form.baseSalary,
+      chefStatus: form.chefStatus
+    };
     if (isResignedStatus(form.chefStatus)) {
       payload.resignReason = form.resignReason;
     }

@@ -23,4 +23,8 @@ describe('backend order management status copy', () => {
     expect(statusSource).toContain("REFUND_FAILED: cookingOrderStatus.REFUND_FAILED");
     expect(orderPageSource).toContain('const statusText = orderStatusText');
   });
+
+  it('binds the order list status tag type to the status map', () => {
+    expect(orderPageSource).toContain('<el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag>');
+  });
 });

@@ -28,7 +28,7 @@
         <el-table-column label="上门时间" prop="serviceStartTime" min-width="170" />
         <el-table-column label="真实开始服务时间" prop="serviceStartedTime" min-width="170" />
         <el-table-column label="状态" min-width="140">
-          <template #default="{ row }"><el-tag>{{ statusText(row.status) }}</el-tag></template>
+          <template #default="{ row }"><el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag></template>
         </el-table-column>
         <el-table-column label="报价" prop="quoteAmount" min-width="100" />
         <el-table-column label="支付金额" prop="payAmount" min-width="110" />
