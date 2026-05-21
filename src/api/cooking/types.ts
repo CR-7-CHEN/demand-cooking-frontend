@@ -25,6 +25,7 @@ export interface ChefVO extends CookingBaseForm {
   recommendFlag?: string;
   auditStatus?: string;
   auditBy?: string | number;
+  auditUserName?: string;
   auditTime?: string;
   chefStatus?: string;
   resignReason?: string;

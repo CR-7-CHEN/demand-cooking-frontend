@@ -64,7 +64,7 @@
           </template>
         </el-table-column>
         <el-table-column label="审核人" prop="auditBy" min-width="110">
-          <template #default="{ row }">{{ row.auditBy || '-' }}</template>
+          <template #default="{ row }">{{ row.auditUserName || row.auditBy || '-' }}</template>
         </el-table-column>
         <el-table-column label="审核时间" min-width="160">
           <template #default="{ row }">{{ formatDateTime(row.auditTime) || '-' }}</template>
