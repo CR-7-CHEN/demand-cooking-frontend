@@ -67,14 +67,29 @@ watchEffect(() => {
 });
 
 const settingRef = ref<InstanceType<typeof Settings>>();
+const apiBaseUrl = import.meta.env.VITE_APP_BASE_API;
+
+const buildHttpUrl = (path: string) => {
+  if (/^https?:\/\//.test(apiBaseUrl)) {
+    return apiBaseUrl + path;
+  }
+  return apiBaseUrl + path;
+};
+
+const buildWebSocketUrl = (path: string) => {
+  if (/^https?:\/\//.test(apiBaseUrl)) {
+    return apiBaseUrl.replace(/^http/, 'ws') + path;
+  }
+  const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+  return protocol + window.location.host + apiBaseUrl + path;
+};
 
 onMounted(() => {
-  const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-  initWebSocket(protocol + window.location.host + import.meta.env.VITE_APP_BASE_API + '/resource/websocket');
+  initWebSocket(buildWebSocketUrl('/resource/websocket'));
 });
 
 onMounted(() => {
-  initSSE(import.meta.env.VITE_APP_BASE_API + '/resource/sse');
+  initSSE(buildHttpUrl('/resource/sse'));
 });
 
 const handleClickOutside = () => {
