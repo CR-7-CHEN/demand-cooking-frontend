@@ -26,9 +26,9 @@
           <template #default="{ row }">{{ userDisplay(row) }}</template>
         </el-table-column>
         <el-table-column label="上门时间" prop="serviceStartTime" min-width="170" />
-        <el-table-column label="开始服务时间" prop="serviceStartedTime" min-width="170" />
+        <el-table-column label="真实开始服务时间" prop="serviceStartedTime" min-width="170" />
         <el-table-column label="状态" min-width="140">
-          <template #default="{ row }"><el-tag>{{ statusText(row.status) }}</el-tag></template>
+          <template #default="{ row }"><el-tag :type="statusTagType(row.status)">{{ statusText(row.status) }}</el-tag></template>
         </el-table-column>
         <el-table-column label="报价" prop="quoteAmount" min-width="100" />
         <el-table-column label="支付金额" prop="payAmount" min-width="110" />
@@ -62,7 +62,7 @@
         <div class="section-header"><span class="section-title">服务信息</span></div>
         <el-descriptions :column="2" border>
           <el-descriptions-item label="上门时间">{{ current.serviceStartTime || '-' }}</el-descriptions-item>
-          <el-descriptions-item label="开始服务时间">{{ current.serviceStartedTime || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="真实开始服务时间">{{ current.serviceStartedTime || '-' }}</el-descriptions-item>
           <el-descriptions-item label="服务完成时间">{{ current.serviceCompleteTime || '-' }}</el-descriptions-item>
           <el-descriptions-item label="确认完成时间">{{ current.confirmTime || '-' }}</el-descriptions-item>
           <el-descriptions-item label="服务区域">{{ current.serviceArea || '-' }}</el-descriptions-item>
@@ -120,6 +120,7 @@
 <script setup name="CookingOrder" lang="ts">
 import { confirmOrder, listOrder, paySuccessOrder } from '@/api/cooking/order';
 import type { OrderVO } from '@/api/cooking/order/types';
+import { orderStatusOptions, orderStatusTagType, orderStatusText } from '@/api/cooking/status';
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance;
 const loading = ref(false);
@@ -129,24 +130,7 @@ const queryParams = reactive<any>({ pageNum: 1, pageSize: 10, orderNo: '', chefN
 const detail = reactive({ visible: false });
 const current = reactive<any>({});
 
-const statusTextMap: Record<string, string> = {
-  WAITING_RESPONSE: '待响应',
-  REJECTED_CLOSED: '已拒单',
-  RESPONSE_TIMEOUT_CLOSED: '响应超时关闭',
-  WAITING_PAY: '待支付',
-  PRICE_OBJECTION: '异议中',
-  OBJECTION_TIMEOUT_CLOSED: '异议超时关闭',
-  PAY_TIMEOUT_CLOSED: '支付超时关闭',
-  WAITING_SERVICE: '待服务',
-  WAITING_CONFIRM: '用户待确认',
-  COMPLETED: '已完成',
-  CANCELED: '已取消',
-  REFUNDING: '退款中',
-  REFUNDED: '已退款',
-  REFUND_FAILED: '退款失败'
-};
-
-const statusOptions = Object.entries(statusTextMap).map(([value, label]) => ({ value, label }));
+const statusOptions = orderStatusOptions;
 
 const getList = async () => {
   loading.value = true;
@@ -173,26 +157,8 @@ const quickAction = async (row: OrderVO, action: 'pay' | 'confirm') => {
   getList();
 };
 
-const statusText = (value?: string) => statusTextMap[value || ''] || value || '-';
-const statusTagType = (value?: string) => {
-  const map: Record<string, string> = {
-    WAITING_RESPONSE: 'warning',
-    REJECTED_CLOSED: 'info',
-    RESPONSE_TIMEOUT_CLOSED: 'info',
-    WAITING_PAY: 'warning',
-    PRICE_OBJECTION: 'danger',
-    OBJECTION_TIMEOUT_CLOSED: 'info',
-    PAY_TIMEOUT_CLOSED: 'info',
-    WAITING_SERVICE: '',
-    WAITING_CONFIRM: '',
-    COMPLETED: 'success',
-    CANCELED: 'info',
-    REFUNDING: 'info',
-    REFUNDED: 'info',
-    REFUND_FAILED: 'danger'
-  };
-  return map[value || ''] || '';
-};
+const statusText = orderStatusText;
+const statusTagType = orderStatusTagType;
 const chefDisplay = (row: OrderVO) => row.chefName || row.chefId || '-';
 const userDisplay = (row: OrderVO) => row.userName || row.nickName || row.userId || '-';
 const parsedDish = computed(() => {

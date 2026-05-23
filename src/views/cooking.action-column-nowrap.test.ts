@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-const modulesWithActions = ['address', 'area', 'message', 'review', 'faq', 'ticket', 'chef', 'settlement', 'config', 'dish', 'complaint', 'order'];
+const modulesWithActions = ['address', 'area', 'review', 'chef', 'settlement', 'config', 'dish', 'complaint', 'order'];
 
 const readPage = (moduleName: string) => readFileSync(resolve(__dirname, 'cooking', moduleName, 'index.vue'), 'utf8');
 

@@ -24,6 +24,9 @@ export interface ChefVO extends CookingBaseForm {
   completedOrders?: number;
   recommendFlag?: string;
   auditStatus?: string;
+  auditBy?: string | number;
+  auditUserName?: string;
+  auditTime?: string;
   chefStatus?: string;
   resignReason?: string;
   availableTimeText?: string;
@@ -79,7 +82,9 @@ export interface ComplaintVO extends CookingBaseForm {
   chefId?: string | number;
   chefName?: string;
   complaintType?: string;
+  content?: string;
   status?: string;
+  handleResult?: string;
 }
 
 export interface SettlementVO extends CookingBaseForm {
@@ -105,6 +110,7 @@ export interface SettlementVO extends CookingBaseForm {
   reviewHandleTime?: string;
   confirmTime?: string;
   payTime?: string;
+  payRemark?: string;
 }
 
 export interface ConfigVO extends CookingBaseForm {

@@ -11,7 +11,7 @@ describe('homepage pending item navigation', () => {
   it('makes only chef audit and complaint reply pending items navigable', () => {
     expect(homepageSource).toContain('const pendingItemRoutes');
     expect(homepageSource).toContain("chefAudit: { path: '/cooking/chef', query: { auditStatus: '0' } }");
-    expect(homepageSource).toContain("complaintReply: { path: '/cooking/complaint', query: { status: 'PENDING' } }");
+    expect(homepageSource).toContain("complaintReply: { path: '/cooking/complaint', query: { status: cookingComplaintStatus.PENDING } }");
     expect(homepageSource).not.toMatch(/chefService:\s*\{\s*path:/);
   });
 

@@ -19,6 +19,7 @@ export interface SettlementReviewResolveForm {
 
 export interface SettlementPayForm {
   settlementId?: string | number;
+  payRemark?: string;
 }
 
 export type SettlementVO = BaseSettlementVO;

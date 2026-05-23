@@ -58,14 +58,20 @@
         </el-table-column>
         <el-table-column label="评分" prop="rating" min-width="90" />
         <el-table-column label="完成单数" prop="completedOrders" min-width="100" />
-        <el-table-column label="审核" min-width="100">
+        <el-table-column label="审核状态" min-width="100">
           <template #default="{ row }">
             <el-tag>{{ auditText(row.auditStatus) }}</el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="审核人" prop="auditBy" min-width="110">
+          <template #default="{ row }">{{ row.auditUserName || row.auditBy || '-' }}</template>
+        </el-table-column>
+        <el-table-column label="审核时间" min-width="160">
+          <template #default="{ row }">{{ formatDateTime(row.auditTime) || '-' }}</template>
+        </el-table-column>
         <el-table-column label="状态" min-width="100">
           <template #default="{ row }">
-            <el-tag :type="row.chefStatus === '0' ? 'success' : 'info'">{{ statusText(row.chefStatus) }}</el-tag>
+            <el-tag :type="normalizeChefStatus(row.chefStatus) === '0' ? 'success' : 'info'">{{ statusText(row.chefStatus) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="驳回原因" prop="auditReason" min-width="180" show-overflow-tooltip />
@@ -73,9 +79,10 @@
         <el-table-column label="操作" fixed="right" width="250" class-name="table-action-cell">
           <template #default="{ row }">
             <el-button link type="primary" icon="Edit" @click="handleEdit(row)">编辑</el-button>
-            <el-button link type="success" @click="handleAudit(row, '1')">通过</el-button>
-            <el-button link type="danger" @click="handleRejectAudit(row)">驳回</el-button>
-            <el-button link type="warning" @click="handleStatus(row, '1')">暂停</el-button>
+            <el-button v-if="canAudit(row)" link type="success" @click="handleAudit(row, '1')">通过</el-button>
+            <el-button v-if="canAudit(row)" link type="danger" @click="handleRejectAudit(row)">驳回</el-button>
+            <el-button v-if="canPauseChef(row)" link type="warning" @click="handleStatus(row, '1')">暂停</el-button>
+            <el-button v-if="canResumeChef(row)" link type="success" @click="handleStatus(row, '0')">恢复接单</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -256,7 +263,24 @@ const handleEdit = (row: ChefVO) => {
 
 const submit = async () => {
   if (form.chefId) {
-    const payload: any = { chefId: form.chefId, chefStatus: form.chefStatus, baseSalary: form.baseSalary };
+    const payload: any = {
+      chefId: form.chefId,
+      chefName: form.chefName,
+      mobile: form.mobile,
+      gender: form.gender,
+      age: form.age,
+      avatarUrl: form.avatarUrl,
+      workImageUrls: form.workImageUrls,
+      healthCertImageUrl: form.healthCertImageUrl,
+      healthCertExpireDate: formatDate(form.healthCertExpireDate),
+      intro: form.intro,
+      specialties: form.specialties ?? form.skillTags,
+      skillTags: form.skillTags,
+      serviceArea: form.serviceArea,
+      availableTimes: form.availableTimes,
+      baseSalary: form.baseSalary,
+      chefStatus: form.chefStatus
+    };
     if (isResignedStatus(form.chefStatus)) {
       payload.resignReason = form.resignReason;
     }
@@ -395,10 +419,26 @@ const imageList = (value?: string | string[]) => {
     .filter(Boolean);
 };
 
-const auditText = (value?: string) => ({ '0': '待审核', '1': '通过', '2': '驳回', PENDING: '待审核', APPROVED: '通过', REJECTED: '驳回' })[value || ''] || value || '-';
-const statusText = (value?: string) => ({ '0': '可接单', '1': '暂停', '2': '禁用', '3': '离职', APPROVED: '可接单', PAUSED: '暂停', DISABLED: '禁用', RESIGNED: '离职' })[value || ''] || value || '-';
+const normalizeAuditStatus = (value?: string | number) => {
+  const key = String(value ?? '').trim().toUpperCase();
+  return ({ PENDING: '0', APPROVED: '1', REJECTED: '2' } as Record<string, string>)[key] || key;
+};
+
+const normalizeChefStatus = (value?: string | number) => {
+  const key = String(value ?? '').trim().toUpperCase();
+  return ({ NORMAL: '0', AVAILABLE: '0', APPROVED: '0', PAUSED: '1', DISABLED: '2', RESIGNED: '3' } as Record<string, string>)[key] || key;
+};
+
+const auditText = (value?: string | number) => ({ '0': '待审核', '1': '通过', '2': '驳回' })[normalizeAuditStatus(value)] || String(value ?? '') || '-';
+const statusText = (value?: string | number) => ({ '0': '可接单', '1': '暂停', '2': '禁用', '3': '离职' })[normalizeChefStatus(value)] || String(value ?? '') || '-';
 const genderText = (value?: string) => ({ '0': '男', '1': '女', '2': '未知' })[value || ''] || '-';
-const isResignedStatus = (value?: string) => ['3', 'RESIGNED'].includes(String(value || ''));
+const isApprovedAudit = (value?: string | number) => normalizeAuditStatus(value) === '1';
+const isNormalChefStatus = (value?: string | number) => normalizeChefStatus(value) === '0';
+const isPausedChefStatus = (value?: string | number) => normalizeChefStatus(value) === '1';
+const isResignedStatus = (value?: string | number) => normalizeChefStatus(value) === '3';
+const canAudit = (row: ChefVO) => ['', '0'].includes(normalizeAuditStatus(row.auditStatus));
+const canPauseChef = (row: ChefVO) => isApprovedAudit(row.auditStatus) && isNormalChefStatus(row.chefStatus);
+const canResumeChef = (row: ChefVO) => isApprovedAudit(row.auditStatus) && isPausedChefStatus(row.chefStatus);
 
 onMounted(getList);
 </script>

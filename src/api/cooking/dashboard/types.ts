@@ -25,6 +25,14 @@ export interface DashboardRecentOrder {
   createTime?: string;
 }
 
+export interface DashboardTopChef {
+  chefId: number;
+  chefName: string;
+  rating: number | string;
+  completedOrders: number;
+  avatarUrl?: string;
+}
+
 export interface DashboardOverviewVO {
   todayOrders: number;
   todayRevenue: number | string;
@@ -36,4 +44,5 @@ export interface DashboardOverviewVO {
   revenueTrend: DashboardRevenueTrendItem[];
   pendingItems: DashboardPendingItem[];
   recentOrders: DashboardRecentOrder[];
+  topRatedChefs: DashboardTopChef[];
 }

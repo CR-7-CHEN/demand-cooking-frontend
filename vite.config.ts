@@ -5,6 +5,17 @@ import path from 'path';
 
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd());
+  const proxy =
+    env.VITE_APP_BASE_API && env.VITE_APP_BASE_API.startsWith('/')
+      ? {
+          [env.VITE_APP_BASE_API]: {
+            target: 'https://www.crongcr7.xyz:8077',
+            changeOrigin: true,
+            ws: true,
+            rewrite: (path: string) => path.replace(new RegExp('^' + env.VITE_APP_BASE_API), '')
+          }
+        }
+      : undefined;
   return {
     // 部署生产环境和开发环境下的URL。
     // 默认情况下，vite 会假设你的应用是被部署在一个域名的根路径上
@@ -22,14 +33,7 @@ export default defineConfig(({ mode, command }) => {
       host: '0.0.0.0',
       port: Number(env.VITE_APP_PORT),
       open: true,
-      proxy: {
-        [env.VITE_APP_BASE_API]: {
-          target: 'http://localhost:8080',
-          changeOrigin: true,
-          ws: true,
-          rewrite: (path) => path.replace(new RegExp('^' + env.VITE_APP_BASE_API), '')
-        }
-      }
+      proxy
     },
     css: {
       preprocessorOptions: {
